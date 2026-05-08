@@ -1,0 +1,169 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - Criar Conta</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/cadastro.css' %}">
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <p class="header-subtitle">
+                Já possui uma conta? <a href="{% url 'index' %}" class="login-link">Login</a>
+            </p>
+        </div>
+
+
+        <div class="signup-card">
+
+            <h2 class="signup-title">Criar Conta</h2>
+            <p class="signup-description">
+                Junte-se ao TaskFlow para simplificar seus fluxos de trabalho e colaboração em equipe.
+            </p>
+
+
+            <form class="signup-form" id="signupForm">
+                {% csrf_token %}
+
+
+                <div class="form-group">
+                    <label for="fullName" class="form-label">
+                        <i class="fas fa-user"></i> Nome Completo
+                    </label>
+                    <input 
+                        type="text" 
+                        id="fullName" 
+                        name="fullName" 
+                        class="form-input" 
+                        placeholder="João Silva"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i> E-mail de Trabalho
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-input" 
+                        placeholder="joao@empresa.com"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <div class="password-header">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> Senha
+                        </label>
+                        <span class="password-hint">Mín. 8 caracteres</span>
+                    </div>
+                    <div class="password-input-wrapper">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="••••••••"
+                            required
+                        >
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+
+
+                    <div class="password-requirements">
+                        <div class="requirement" id="req-length">
+                            <i class="fas fa-circle"></i>
+                            <span>Pelo menos 8 caracteres</span>
+                        </div>
+                        <div class="requirement" id="req-uppercase">
+                            <i class="fas fa-circle"></i>
+                            <span>Uma letra maiúscula</span>
+                        </div>
+                        <div class="requirement" id="req-number">
+                            <i class="fas fa-circle"></i>
+                            <span>Um número</span>
+                        </div>
+                        <div class="requirement" id="req-special">
+                            <i class="fas fa-circle"></i>
+                            <span>Um caractere especial (!@#$%^&*)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">
+                        <i class="fas fa-lock"></i> Confirmar Senha
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            class="form-input" 
+                            placeholder="••••••••"
+                            required
+                        >
+                        <button type="button" class="password-toggle" id="toggleConfirmPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="terms-checkbox">
+                    <input 
+                        type="checkbox" 
+                        id="terms" 
+                        name="terms"
+                        class="checkbox-input"
+                        required
+                    >
+                    <label for="terms" class="checkbox-label">
+                        Concordo com os <a href="#" class="terms-link">Termos de Serviço</a> e <a href="#" class="terms-link">Política de Privacidade</a>
+                    </label>
+                </div>
+
+
+                <button type="submit" class="btn-create">
+                    Criar Conta
+                </button>
+            </form>
+
+
+            <div class="divider">OU INSCREVER-SE COM</div>
+
+
+            <div class="social-signup">
+                <button type="button" class="btn-social" id="googleBtn">
+                    <i class="fab fa-google"></i> Google
+                </button>
+                <button type="button" class="btn-social" id="githubBtn">
+                    <i class="fab fa-github"></i> GitHub
+                </button>
+            </div>
+        </div>
+
+        <div class="footer-links">
+            <a href="#">Documentação</a>
+            <a href="#">Referência de API</a>
+            <a href="#">Contato Engenharia</a>
+        </div>
+    </div>
+
+    <script src="{% static 'js/cadastro.js' %}"></script>
+</body>
+</html>
