@@ -9,7 +9,8 @@ Uma aplicação web moderna para gerenciamento de tarefas e notas, com autentica
 **TaskFlow** é uma plataforma de produtividade que combina:
 - 🔐 **Autenticação Segura** - Login, cadastro e recuperação de senha
 - 📝 **Editor de Notas** - Editor WYSIWYG com formatação em tempo real (negrito, itálico, links, etc.)
-- 📊 **Dashboard** - Visualização rápida de estatísticas e tarefas
+- � **Gerenciador de Tarefas** - To-do list com sub-tarefas, prioridades e filtros
+- �📊 **Dashboard** - Visualização rápida de estatísticas e tarefas
 - 🎨 **Interface Moderna** - Design responsivo com barra lateral e componentes customizados
 - ⚡ **Auto-save** - Salvamento automático de notas a cada 1.5s
 - 🔔 **Notificações** - Sistema de toasts e modais customizados
@@ -66,14 +67,15 @@ TaskFlow/
 │   └── asgi.py              # Servidor async
 │
 ├── pages/                    # Aplicação principal
-│   ├── models.py            # Modelos de dados (Notebook)
+│   ├── models.py            # Modelos de dados (Notebook, Task, SubTask)
 │   ├── views.py             # Views (lógica das requisições)
 │   ├── urls.py              # Roteamento da app
 │   ├── admin.py             # Painel admin
 │   ├── apps.py              # Configurações da app
 │   │
 │   ├── migrations/          # Migrações do banco de dados
-│   │   └── 0001_initial.py
+│   │   ├── 0001_initial.py
+│   │   └── 0002_task_subtask.py
 │   │
 │   ├── templates/           # Templates HTML
 │   │   ├── base.html        # Template base (sidebar + header)
@@ -81,20 +83,23 @@ TaskFlow/
 │   │   ├── recuperacao.html # Recuperação de senha
 │   │   ├── cadastro.html    # Cadastro
 │   │   ├── dashboard.html   # Dashboard
-│   │   └── caderno.html     # Editor de notas
+│   │   ├── caderno.html     # Editor de notas
+│   │   └── tarefas.html     # Gerenciador de tarefas
 │   │
 │   ├── static/              # Arquivos estáticos
 │   │   ├── css/
 │   │   │   ├── base.css         # Estilos base (sidebar, header)
 │   │   │   ├── dashboard.css    # Estilos dashboard
-│   │   │   └── caderno.css      # Estilos editor (modais, toasts)
+│   │   │   ├── caderno.css      # Estilos editor (modais, toasts)
+│   │   │   └── tarefas.css      # Estilos gerenciador de tarefas
 │   │   │
 │   │   └── js/
 │   │       ├── base.js          # Lógica base (menu, header)
 │   │       ├── index.js         # Lógica login
 │   │       ├── cadastro.js      # Lógica cadastro
 │   │       ├── dashboard.js     # Lógica dashboard
-│   │       └── caderno.js       # Lógica editor (modais, toasts, save)
+│   │       ├── caderno.js       # Lógica editor (modais, toasts, save)
+│   │       └── tarefas.js       # Lógica gerenciador de tarefas
 │   │
 │   └── tests.py             # Testes unitários
 │
@@ -190,7 +195,50 @@ A aplicação estará disponível em: **http://127.0.0.1:8000**
   - Visibilidade (Privado/Público)
   - Data de criação/atualização
 
-### 📊 Dashboard
+### � Gerenciador de Tarefas
+- **Criar Tarefas** - Modal com nome e prioridade
+  - Criação rápida via modal
+  - Seleção de prioridade (Baixa, Média, Alta)
+  - Entrada automática de foco
+
+- **Editar Tarefas** - Modal completo
+  - Título, descrição, prioridade
+  - Validação de campos
+  - Toast de sucesso
+
+- **Sub-tarefas** - Tarefas dentro de tarefas
+  - Criar sub-tarefas diretamente da tarefa
+  - Marcar como concluídas independentemente
+  - Progresso visual (X/Y concluídas)
+  - Deletar sub-tarefas individual
+
+- **Marcar como Concluída** - Checkbox com visual feedback
+  - Tarefa com strikethrough quando concluída
+  - Opacidade reduzida
+  - Atualização em tempo real
+
+- **Deletar Tarefas** - Modal de confirmação
+  - Confirmação obrigatória (botão vermelho)
+  - Deleta tarefa e todas suas sub-tarefas
+  - Toast de sucesso
+
+- **Filtros Avançados**
+  - Por status: Todas, Pendentes, Concluídas
+  - Por prioridade: Alta, Média, Baixa
+  - Combinação de múltiplos filtros
+
+- **Busca em Tempo Real**
+  - Busca por título da tarefa
+  - Busca por descrição
+  - Resultado instantâneo enquanto digita
+
+- **Estatísticas**
+  - Total de tarefas
+  - Tarefas concluídas
+  - Tarefas pendentes
+  - Atualiza automaticamente
+
+### �📊 Dashboard
 - **Estatísticas** - Cards com métricas
 - **Gráfico de Barras** - Visualização de tarefas por dia
 - **Lista de Tarefas** - Itens com checkbox
@@ -309,6 +357,67 @@ showToast('sucesso', 'success')
 Após 500ms → window.location.href = '/caderno/{id}/'
 ```
 
+### 5. Fluxo de Gerenciamento de Tarefas
+```
+Usuário acessa /tarefas/
+   ↓
+TasksListView renderiza tarefas.html
+   ↓
+JavaScript carrega tarefas via GET /api/task/list/
+   ↓
+Retorna JSON com todas as tarefas + sub-tarefas
+   ↓
+renderTasks() popula a lista
+   ↓
+Usuário clica "Nova Tarefa"
+   ↓
+showModalCreateTask() abre modal
+   ↓
+Usuário preenche título + prioridade
+   ↓
+Fetch POST para /api/task/create/
+   ↓
+Django cria Task no banco
+   ↓
+showToast('Tarefa criada!', 'success')
+   ↓
+loadTasks() recarrega lista
+
+Fluxo de Sub-tarefas:
+```
+Usuário clica "Adicionar sub-tarefa"
+   ↓
+Input via prompt() pede título
+   ↓
+Fetch POST para /api/subtask/create/
+   ↓
+Django cria SubTask vinculada à Task
+   ↓
+Task.subtasks_count atualiza automaticamente
+   ↓
+Checkbox para marcar como concluída
+   ↓
+Fetch POST para /api/subtask/toggle/
+   ↓
+Sub-tarefa visual atualiza (strikethrough)
+
+Fluxo de Filtros e Busca:
+```
+Usuário seleciona filtro (status/prioridade)
+   ↓
+applyFilters() re-filtra array allTasks
+   ↓
+renderTasks() re-renderiza lista
+   ↓
+Estatísticas atualizam automaticamente
+   ↓
+Usuário digita na busca
+   ↓
+filteredTasks filtra por título/descrição
+   ↓
+Resultado instantâneo enquanto digita
+```
+
 ---
 
 ## 🔒 Segurança
@@ -351,6 +460,45 @@ SESSION_COOKIE_AGE = 1209600
 
 ---
 
+## 📊 Modelos de Dados
+
+### Notebook
+```python
+title: CharField(max_length=200)
+owner: ForeignKey(User)
+content: TextField()
+visibility: CharField(choices=['private', 'public'])
+created_at: DateTimeField(auto_now_add=True)
+updated_at: DateTimeField(auto_now=True)
+```
+
+### Task (Tarefa)
+```python
+title: CharField(max_length=200)
+description: TextField(blank=True)
+owner: ForeignKey(User)
+completed: BooleanField(default=False)
+priority: CharField(choices=['low', 'medium', 'high'])
+due_date: DateTimeField(null=True, blank=True)
+created_at: DateTimeField(auto_now_add=True)
+updated_at: DateTimeField(auto_now=True)
+
+Propriedades:
+- subtasks_count: Contador de sub-tarefas
+- subtasks_completed: Contador de sub-tarefas concluídas
+```
+
+### SubTask (Sub-tarefa)
+```python
+title: CharField(max_length=200)
+task: ForeignKey(Task)
+completed: BooleanField(default=False)
+created_at: DateTimeField(auto_now_add=True)
+updated_at: DateTimeField(auto_now=True)
+```
+
+---
+
 ## 📡 Endpoints da API
 
 | Método | URL | Descrição | Auth |
@@ -368,6 +516,15 @@ SESSION_COOKIE_AGE = 1209600
 | POST | /api/notebook/save/ | Salvar nota | ✅ |
 | POST | /api/notebook/delete/ | Deletar nota | ✅ |
 | POST | /api/notebook/list/ | Listar notas (JSON) | ✅ |
+| GET | /tarefas/ | Página de tarefas | ✅ |
+| POST | /api/task/create/ | Criar tarefa | ✅ |
+| POST | /api/task/update/ | Atualizar tarefa | ✅ |
+| POST | /api/task/toggle/ | Completar/Descompletar tarefa | ✅ |
+| POST | /api/task/delete/ | Deletar tarefa | ✅ |
+| GET | /api/task/list/ | Listar tarefas (JSON) | ✅ |
+| POST | /api/subtask/create/ | Criar sub-tarefa | ✅ |
+| POST | /api/subtask/toggle/ | Completar/Descompletar sub-tarefa | ✅ |
+| POST | /api/subtask/delete/ | Deletar sub-tarefa | ✅ |
 
 ---
 
@@ -413,6 +570,10 @@ SESSION_COOKIE_AGE = 1209600
 - Toast notifications
 - Dashboard básico
 - Responsividade
+- Gerenciador de tarefas com sub-tarefas
+- Filtros por status e prioridade
+- Busca em tempo real de tarefas
+- Estatísticas de tarefas
 
 ### 🔄 Parcial
 - Recuperação de senha (UI pronta, backend não implementado)
@@ -420,13 +581,15 @@ SESSION_COOKIE_AGE = 1209600
 - Features do dashboard (UI pronta, lógica não implementada)
 
 ### ⏳ Futuro
-- Kanban view (Tarefas)
+- Kanban view avançada
 - Gerenciamento de equipes
 - Análise e relatórios
 - Compartilhamento de notas
-- Histórico de versões
-- Busca avançada
-- Tags/categorias
+- Histórico de versões de tarefas
+- Busca avançada com operadores
+- Tags/categorias para tarefas
+- Atribuição de tarefas a outros usuários
+- Data de vencimento com notificações
 
 ---
 
@@ -436,6 +599,11 @@ SESSION_COOKIE_AGE = 1209600
 - Certifique-se de estar autenticado
 - Verifique sessão nos cookies do navegador
 - Limpe cache e tente novamente
+
+### Tarefas não carregam
+- Verifique se as migrações foram aplicadas: `python manage.py migrate`
+- Recarregue a página
+- Abra o console (F12) e verifique erros de fetch
 
 ### Notas não estão salvando
 - Abra o console do navegador (F12)

@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tarefas - TaskFlow{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tarefas.css' %}">
+<link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+{% endblock %}
+
+{% block content %}
+<div class="tasks-container">
+    <aside class="tasks-sidebar">
+        <div class="sidebar-header">
+            <h3>Minhas Tarefas</h3>
+            <button class="btn-new-task" id="btnNewTask" title="Nova tarefa">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+
+        <div class="filter-section">
+            <h4>Filtros</h4>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fas fa-inbox"></i> Todas
+                </button>
+                <button class="filter-btn" data-filter="pending">
+                    <i class="fas fa-circle"></i> Pendentes
+                </button>
+                <button class="filter-btn" data-filter="completed">
+                    <i class="fas fa-check-circle"></i> Concluídas
+                </button>
+            </div>
+        </div>
+
+        <div class="priority-section">
+            <h4>Prioridade</h4>
+            <div class="priority-buttons">
+                <button class="priority-btn" data-priority="high">
+                    <span class="priority-dot high"></span> Alta
+                </button>
+                <button class="priority-btn" data-priority="medium">
+                    <span class="priority-dot medium"></span> Média
+                </button>
+                <button class="priority-btn" data-priority="low">
+                    <span class="priority-dot low"></span> Baixa
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h4>Estatísticas</h4>
+            <div class="stat-item">
+                <span class="stat-label">Total de tarefas</span>
+                <span class="stat-value" id="totalTasks">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Concluídas</span>
+                <span class="stat-value" id="completedTasks">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Pendentes</span>
+                <span class="stat-value" id="pendingTasks">0</span>
+            </div>
+        </div>
+    </aside>
+
+    <div class="tasks-content">
+        <div class="tasks-header">
+            <h1>Tarefas</h1>
+            <input type="text" class="tasks-search" id="tasksSearch" placeholder="Buscar tarefas...">
+        </div>
+
+        <div class="tasks-list" id="tasksList">
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <i class="fas fa-tasks"></i>
+            <h2>Nenhuma tarefa encontrada</h2>
+            <p>Não há tarefas que correspondam aos critérios de busca.</p>
+            <button class="btn-primary" id="btnCreateFirstTask"
+                style="margin-top: 16px; display: inline-flex; align-items: center; justify-content: center; padding: 8px 16px; cursor: pointer;">
+
+                <i class="fas fa-plus" style="margin-right: 8px; font-size: 20px; color: black;"></i>
+                <span>Criar Tarefa</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalCreateTask">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Nova Tarefa</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-body-text">Digite o título da sua nova tarefa:</p>
+            <input type="text" class="modal-input" id="inputTaskTitle" placeholder="Ex: Comprar mantimentos" autofocus>
+            <p class="modal-body-text" style="margin-top: 16px;">Prioridade:</p>
+            <div class="priority-select">
+                <label class="priority-label">
+                    <input type="radio" name="taskPriority" value="low" checked>
+                    <span class="priority-radio"><span class="priority-dot low"></span> Baixa</span>
+                </label>
+                <label class="priority-label">
+                    <input type="radio" name="taskPriority" value="medium">
+                    <span class="priority-radio"><span class="priority-dot medium"></span> Média</span>
+                </label>
+                <label class="priority-label">
+                    <input type="radio" name="taskPriority" value="high">
+                    <span class="priority-radio"><span class="priority-dot high"></span> Alta</span>
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-secondary" id="btnCancelTask">Cancelar</button>
+            <button class="modal-btn modal-btn-primary" id="btnConfirmTask">Criar Tarefa</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditTask">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Editar Tarefa</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-body-text">Título:</p>
+            <input type="text" class="modal-input" id="inputEditTaskTitle" placeholder="Ex: Comprar mantimentos">
+
+            <p class="modal-body-text" style="margin-top: 16px;">Descrição:</p>
+            <textarea class="modal-textarea" id="inputEditTaskDesc" placeholder="Adicione detalhes..."
+                rows="4"></textarea>
+
+            <p class="modal-body-text" style="margin-top: 16px;">Prioridade:</p>
+            <div class="priority-select">
+                <label class="priority-label">
+                    <input type="radio" name="editTaskPriority" value="low">
+                    <span class="priority-radio"><span class="priority-dot low"></span> Baixa</span>
+                </label>
+                <label class="priority-label">
+                    <input type="radio" name="editTaskPriority" value="medium">
+                    <span class="priority-radio"><span class="priority-dot medium"></span> Média</span>
+                </label>
+                <label class="priority-label">
+                    <input type="radio" name="editTaskPriority" value="high">
+                    <span class="priority-radio"><span class="priority-dot high"></span> Alta</span>
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-secondary" id="btnCancelEditTask">Cancelar</button>
+            <button class="modal-btn modal-btn-primary" id="btnConfirmEditTask">Salvar Alterações</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalConfirm">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="confirmTitle">Confirmar Ação</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-body-text" id="confirmMessage">Tem certeza que deseja continuar?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-secondary" id="btnConfirmCancel">Cancelar</button>
+            <button class="modal-btn modal-btn-primary" id="btnConfirmOk">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="{% static 'js/tarefas.js' %}"></script>
+{% endblock %}

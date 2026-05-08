@@ -1,7 +1,9 @@
 from django.urls import path
 from .views import (
     DashboardView, IndexView, LogoutView, RecuperacaoView, CadastroView,
-    NotebookListView, NotebookCreateAPI, NotebookSaveAPI, NotebookDeleteAPI, NotebookGetListAPI
+    NotebookListView, NotebookCreateAPI, NotebookSaveAPI, NotebookDeleteAPI, NotebookGetListAPI,
+    TasksListView, TaskCreateAPI, TaskUpdateAPI, TaskToggleAPI, TaskDeleteAPI,
+    SubTaskCreateAPI, SubTaskToggleAPI, SubTaskDeleteAPI, TasksGetListAPI
 )
 
 
@@ -19,4 +21,16 @@ urlpatterns = [
     path('api/notebook/save/', NotebookSaveAPI.as_view(), name='notebook_save_api'),
     path('api/notebook/delete/', NotebookDeleteAPI.as_view(), name='notebook_delete_api'),
     path('api/notebook/list/', NotebookGetListAPI.as_view(), name='notebook_list_api'),
+    
+    path('tarefas/', TasksListView.as_view(), name='tarefas'),
+    
+    path('api/task/create/', TaskCreateAPI.as_view(), name='task_create_api'),
+    path('api/task/update/', TaskUpdateAPI.as_view(), name='task_update_api'),
+    path('api/task/toggle/', TaskToggleAPI.as_view(), name='task_toggle_api'),
+    path('api/task/delete/', TaskDeleteAPI.as_view(), name='task_delete_api'),
+    path('api/task/list/', TasksGetListAPI.as_view(), name='task_list_api'),
+    
+    path('api/subtask/create/', SubTaskCreateAPI.as_view(), name='subtask_create_api'),
+    path('api/subtask/toggle/', SubTaskToggleAPI.as_view(), name='subtask_toggle_api'),
+    path('api/subtask/delete/', SubTaskDeleteAPI.as_view(), name='subtask_delete_api'),
 ]

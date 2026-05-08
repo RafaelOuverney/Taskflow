@@ -281,5 +281,283 @@ class NotebookGetListAPI(LoginRequiredMixin, TemplateView):
                 'success': False,
                 'message': f'Erro ao buscar cadernos: {str(e)}'
             }, status=500)
+
+
+class TasksListView(LoginRequiredMixin, TemplateView):
+    template_name = 'tarefas.html'
+    login_url = 'index'
+    
+    def get_context_data(self, **kwargs):
+        from .models import Task
+        context = super().get_context_data(**kwargs)
+        context['user_name'] = self.request.user.first_name or self.request.user.email
+        context['tasks'] = Task.objects.filter(owner=self.request.user)
+        return context
+
+
+class TaskCreateAPI(LoginRequiredMixin, TemplateView):
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        from .models import Task
+        try:
+            data = json.loads(request.body)
+            title = data.get('title', 'Nova Tarefa').strip()
+            priority = data.get('priority', 'medium')
+            
+            task = Task.objects.create(
+                title=title,
+                owner=request.user,
+                priority=priority
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Tarefa criada com sucesso!',
+                'task': {
+                    'id': task.id,
+                    'title': task.title,
+                    'description': task.description,
+                    'priority': task.priority,
+                    'completed': task.completed,
+                    'subtasks_count': task.subtasks_count,
+                    'subtasks_completed': task.subtasks_completed
+                }
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro ao criar tarefa: {str(e)}'
+            }, status=500)
+
+
+class TaskUpdateAPI(LoginRequiredMixin, TemplateView):
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        from .models import Task
+        try:
+            data = json.loads(request.body)
+            task_id = data.get('task_id')
+            title = data.get('title', '').strip()
+            description = data.get('description', '')
+            priority = data.get('priority', 'medium')
+            
+            task = Task.objects.get(id=task_id, owner=request.user)
+            task.title = title
+            task.description = description
+            task.priority = priority
+            task.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Tarefa atualizada com sucesso!'
+            })
+        except Task.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Tarefa não encontrada.'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro ao atualizar tarefa: {str(e)}'
+            }, status=500)
+
+
+class TaskToggleAPI(LoginRequiredMixin, TemplateView):
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        from .models import Task
+        try:
+            data = json.loads(request.body)
+            task_id = data.get('task_id')
+            completed = data.get('completed', False)
+            
+            task = Task.objects.get(id=task_id, owner=request.user)
+            task.completed = completed
+            task.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Tarefa atualizada com sucesso!',
+                'completed': task.completed
+            })
+        except Task.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Tarefa não encontrada.'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro ao atualizar tarefa: {str(e)}'
+            }, status=500)
+
+
+class TaskDeleteAPI(LoginRequiredMixin, TemplateView):
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        from .models import Task
+        try:
+            data = json.loads(request.body)
+            task_id = data.get('task_id')
+            
+            task = Task.objects.get(id=task_id, owner=request.user)
+            task.delete()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Tarefa deletada com sucesso!'
+            })
+        except Task.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Tarefa não encontrada.'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro ao deletar tarefa: {str(e)}'
+            }, status=500)
+
+
+class SubTaskCreateAPI(LoginRequiredMixin, TemplateView):
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        from .models import Task, SubTask
+        try:
+            data = json.loads(request.body)
+            task_id = data.get('task_id')
+            title = data.get('title', 'Nova Sub-tarefa').strip()
+            
+            task = Task.objects.get(id=task_id, owner=request.user)
+            subtask = SubTask.objects.create(
+                title=title,
+                task=task
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Sub-tarefa criada com sucesso!',
+                'subtask': {
+                    'id': subtask.id,
+                    'title': subtask.title,
+                    'completed': subtask.completed
+                }
+            })
+        except Task.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Tarefa não encontrada.'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro ao criar sub-tarefa: {str(e)}'
+            }, status=500)
+
+
+class SubTaskToggleAPI(LoginRequiredMixin, TemplateView):
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        from .models import SubTask, Task
+        try:
+            data = json.loads(request.body)
+            subtask_id = data.get('subtask_id')
+            completed = data.get('completed', False)
+            
+            subtask = SubTask.objects.get(id=subtask_id)
+            if subtask.task.owner != request.user:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Acesso negado.'
+                }, status=403)
+            
+            subtask.completed = completed
+            subtask.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Sub-tarefa atualizada com sucesso!',
+                'completed': subtask.completed
+            })
+        except SubTask.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Sub-tarefa não encontrada.'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro ao atualizar sub-tarefa: {str(e)}'
+            }, status=500)
+
+
+class SubTaskDeleteAPI(LoginRequiredMixin, TemplateView):
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        from .models import SubTask
+        try:
+            data = json.loads(request.body)
+            subtask_id = data.get('subtask_id')
+            
+            subtask = SubTask.objects.get(id=subtask_id)
+            if subtask.task.owner != request.user:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Acesso negado.'
+                }, status=403)
+            
+            subtask.delete()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Sub-tarefa deletada com sucesso!'
+            })
+        except SubTask.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Sub-tarefa não encontrada.'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro ao deletar sub-tarefa: {str(e)}'
+            }, status=500)
+
+
+class TasksGetListAPI(LoginRequiredMixin, TemplateView):
+    def get(self, request):
+        from .models import Task
+        try:
+            tasks = Task.objects.filter(owner=request.user).prefetch_related('subtasks')
+            
+            tasks_data = []
+            for task in tasks:
+                subtasks = [
+                    {'id': s.id, 'title': s.title, 'completed': s.completed}
+                    for s in task.subtasks.all()
+                ]
+                
+                tasks_data.append({
+                    'id': task.id,
+                    'title': task.title,
+                    'description': task.description,
+                    'priority': task.priority,
+                    'completed': task.completed,
+                    'due_date': task.due_date.strftime('%d/%m/%Y %H:%M') if task.due_date else None,
+                    'subtasks': subtasks,
+                    'subtasks_count': task.subtasks_count,
+                    'subtasks_completed': task.subtasks_completed
+                })
+            
+            return JsonResponse({
+                'success': True,
+                'tasks': tasks_data
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro ao buscar tarefas: {str(e)}'
+            }, status=500)
         
 
