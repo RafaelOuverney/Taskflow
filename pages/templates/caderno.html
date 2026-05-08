@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Caderno - TaskFlow{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/caderno.css' %}">
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+{% endblock %}
+
+{% block content %}
+<div class="notebook-container">
+    <aside class="notebooks-sidebar">
+        <div class="sidebar-header">
+            <h3>Meus Cadernos</h3>
+            <button class="btn-new-notebook" id="btnNewNotebook" title="Novo caderno">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+
+        <div class="notebooks-list" id="notebooksList">
+            {% if notebooks %}
+                {% for notebook in notebooks %}
+                    <div class="notebook-item {% if notebook.id == notebook.id %}active{% endif %}" data-notebook-id="{{ notebook.id }}">
+                        <div class="notebook-item-title">{{ notebook.title }}</div>
+                        <div class="notebook-item-meta">
+                            <span class="notebook-item-date">
+                                {{ notebook.updated_at|date:"d/m/Y H:i" }}
+                            </span>
+                            <button class="btn-delete-notebook" data-notebook-id="{{ notebook.id }}" title="Deletar">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </aside>
+
+    <div class="notebook-content">
+        {% if notebook %}
+            <div class="notebook-header">
+                <div class="notebook-title-section">
+                    <input type="text" class="notebook-title-input" id="notebookTitle" 
+                           value="{{ notebook.title }}" placeholder="Título do caderno">
+                    <p class="notebook-subtitle">{% if notebook.owner.first_name %}{{ notebook.owner.first_name }}{% else %}{{ notebook.owner.email }}{% endif %}'s Team</p>
+                </div>
+            </div>
+
+            <div class="editor-toolbar">
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" id="btnBold" title="Negrito (Ctrl+B)">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button class="toolbar-btn" id="btnItalic" title="Itálico (Ctrl+I)">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button class="toolbar-btn" id="btnUnderline" title="Sublinhado (Ctrl+U)">
+                        <i class="fas fa-underline"></i>
+                    </button>
+                    <button class="toolbar-btn" id="btnCode" title="Código">
+                        <i class="fas fa-code"></i>
+                    </button>
+                    <div class="toolbar-separator"></div>
+                    <button class="toolbar-btn" id="btnList" title="Lista">
+                        <i class="fas fa-list"></i>
+                    </button>
+                    <button class="toolbar-btn" id="btnLink" title="Link">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+
+                <div class="toolbar-right">
+                    <span class="save-status" id="saveStatus">Último salvo: agora</span>
+                </div>
+            </div>
+
+            <div class="editor-wrapper">
+                <div class="editor-main">
+                    <div class="editor-content" id="editorContent" contenteditable="true">{{ notebook.content|safe }}</div>
+                </div>
+
+                <aside class="editor-sidebar">
+                    <div class="sidebar-section">
+                        <h4 class="section-title">Detalhes</h4>
+                        <div class="details-menu">
+                            <button class="menu-btn" id="btnDetails">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <div class="metadata">
+                            <div class="metadata-item">
+                                <span class="metadata-label">Proprietário</span>
+                                <span class="metadata-value">
+                                    {% if notebook.owner.first_name %}
+                                        {{ notebook.owner.first_name }}
+                                    {% else %}
+                                        {{ notebook.owner.email }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="metadata-item">
+                                <span class="metadata-label">Visibilidade</span>
+                                <select class="metadata-select" id="visibilitySelect" data-notebook-id="{{ notebook.id }}">
+                                    <option value="private" {% if notebook.visibility == 'private' %}selected{% endif %}>
+                                        🔒 Privado
+                                    </option>
+                                    <option value="public" {% if notebook.visibility == 'public' %}selected{% endif %}>
+                                        🌐 Público
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h4 class="section-title">Histórico</h4>
+                        <div class="history-item">
+                            <div class="history-user">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Você</span>
+                            </div>
+                            <div class="history-action">
+                                Editado há poucos minutos
+                            </div>
+                            <div class="history-time">{{ notebook.updated_at|date:"d/m/Y H:i" }}</div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-book"></i>
+                <h2>Nenhum caderno selecionado</h2>
+                <p>Crie um novo caderno para começar a escrever</p>
+                <button class="btn-primary" id="btnCreateFirstNotebook">
+                    <i class="fas fa-plus fa-xs" style="margin-right: 8px; margin-left: -28px; color: white; align-items: center;"></i> Criar Primeiro Caderno
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalCreateNotebook">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Novo Caderno</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-body-text">Digite o nome do seu novo caderno:</p>
+            <input type="text" class="modal-input" id="inputNotebookTitle" placeholder="Ex: Minhas Anotações" autofocus>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-secondary" id="btnCancelNotebook">Cancelar</button>
+            <button class="modal-btn modal-btn-primary" id="btnConfirmNotebook">Criar Caderno</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalAddLink">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Adicionar Link</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-body-text">Digite a URL do link:</p>
+            <input type="text" class="modal-input" id="inputLinkUrl" placeholder="https://exemplo.com" autofocus>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-secondary" id="btnCancelLink">Cancelar</button>
+            <button class="modal-btn modal-btn-primary" id="btnConfirmLink">Adicionar Link</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalConfirm">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="confirmTitle">Confirmar Ação</h2>
+        </div>
+        <div class="modal-body">
+            <p class="modal-body-text" id="confirmMessage">Tem certeza que deseja continuar?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-secondary" id="btnConfirmCancel">Cancelar</button>
+            <button class="modal-btn modal-btn-primary" id="btnConfirmOk">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="{% static 'js/caderno.js' %}"></script>
+{% endblock %}
+

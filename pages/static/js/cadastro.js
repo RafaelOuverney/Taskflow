@@ -233,21 +233,37 @@ signupForm.addEventListener('submit', async (e) => {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando conta...';
 
     try {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        const response = await fetch('/cadastro/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                fullName: fullName,
+                email: email,
+                password: password,
+                confirmPassword: confirmPassword,
+                terms: termsAccepted
+            })
+        });
 
-        showSuccessPopup('Conta criada com sucesso!');
+        const data = await response.json();
 
-        signupForm.reset();
-        clearError(fullNameInput);
-        clearError(emailInput);
-        clearError(passwordInput);
-        clearError(confirmPasswordInput);
-
-        Object.values(requirements).forEach(req => req.classList.remove('met'));
-
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 2000);
+        if (data.success) {
+            showSuccessPopup('Conta criada com sucesso!');
+            signupForm.reset();
+            clearError(fullNameInput);
+            clearError(emailInput);
+            clearError(passwordInput);
+            clearError(confirmPasswordInput);
+            Object.values(requirements).forEach(req => req.classList.remove('met'));
+            setTimeout(() => {
+                window.location.href = data.redirect;
+            }, 2000);
+        } else {
+            showError(emailInput, data.message);
+        }
 
     } catch (error) {
         showError(emailInput, 'Erro ao criar conta. Tente novamente.');
@@ -260,13 +276,13 @@ signupForm.addEventListener('submit', async (e) => {
 googleBtn.addEventListener('click', (e) => {
     e.preventDefault();
     console.log('Google signup clicked');
-    showSuccessPopup('Inscrição com Google iniciada...');
+    showSuccessPopup('Em breve');
 });
 
 githubBtn.addEventListener('click', (e) => {
     e.preventDefault();
     console.log('GitHub signup clicked');
-    showSuccessPopup('Inscrição com GitHub iniciada...');
+    showSuccessPopup('Em breve');
 });
 
 console.log('Signup form initialized successfully');

@@ -1,4 +1,3 @@
-// ===== DOM Elements =====
 const loginForm = document.getElementById('loginForm');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
@@ -14,11 +13,17 @@ function validatePassword(password) {
     return password.length >= 6;
 }
 
+function getCsrfToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    return csrfToken ? csrfToken.value : '';
+}
+
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const email = emailInput.value.trim();
     const password = passwordInput.value;
+    const rememberMe = document.getElementById('remember').checked;
 
     if (!validateEmail(email)) {
         showError(emailInput, 'E-mail inválido');
@@ -39,13 +44,28 @@ loginForm.addEventListener('submit', async (e) => {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
 
     try {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        const response = await fetch('/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ email, password, rememberMe })
+        });
 
-        showSuccess('Login successful! Redirecting...');
+        const data = await response.json();
 
+        if (data.success) {
+            showSuccess('Login bem-sucedido! Redirecionando...');
+            setTimeout(() => {
+                window.location.href = data.redirect;
+            }, 500);
+        } else {
+            showError(emailInput, data.message);
+        }
 
     } catch (error) {
-        showError(emailInput, 'Login failed. Please try again.');
+        showError(emailInput, 'Erro ao fazer login. Tente novamente.');
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;

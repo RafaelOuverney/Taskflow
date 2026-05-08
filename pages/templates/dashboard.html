@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TaskFlow - Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div class="dashboard-title">
+        <h1>Visão Geral da Produtividade da Equipe</h1>
+        <p>Métricas de desempenho em tempo real e distribuição de tarefas ativas.</p>
+    </div>
+    <div class="dashboard-filters">
+        <button class="filter-btn active">Semanal</button>
+        <button class="filter-btn">Mensal</button>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <i class="fas fa-tasks stat-icon"></i>
+            <span class="stat-badge">+12%</span>
+        </div>
+        <div class="stat-body">
+            <p class="stat-label">Total de Tarefas</p>
+            <h3 class="stat-value">248</h3>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <i class="fas fa-check-circle stat-icon completed"></i>
+            <span class="stat-badge completed">84% Taxa</span>
+        </div>
+        <div class="stat-body">
+            <p class="stat-label">Concluídas</p>
+            <h3 class="stat-value">204</h3>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <i class="fas fa-exclamation-circle stat-icon overdue"></i>
+            <span class="stat-badge overdue">Ação Necessária</span>
+        </div>
+        <div class="stat-body">
+            <p class="stat-label">Atrasadas</p>
+            <h3 class="stat-value">12</h3>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="chart-section">
+        <div class="chart-header">
+            <h2>Tarefas Completadas por Dia</h2>
+            <button class="menu-btn">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+        </div>
+        <div class="chart-container">
+            <div class="chart">
+                <div class="bar-wrapper">
+                    <div class="bar" style="height: 60%;" data-day="SEG"></div>
+                    <span>SEG</span>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar" style="height: 75%;" data-day="TER"></div>
+                    <span>TER</span>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar" style="height: 65%;" data-day="QUA"></div>
+                    <span>QUA</span>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar active" style="height: 95%;" data-day="QUI"></div>
+                    <span>QUI</span>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar" style="height: 70%;" data-day="SEX"></div>
+                    <span>SEX</span>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar" style="height: 50%;" data-day="SAB"></div>
+                    <span>SAB</span>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar" style="height: 45%;" data-day="DOM"></div>
+                    <span>DOM</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="tasks-section">
+            <div class="section-header">
+                <h3>Minhas Tarefas</h3>
+                <a href="#" class="view-all">Ver Tudo ></a>
+            </div>
+
+            <div class="tasks-list">
+                <div class="task-item">
+                    <div class="task-checkbox">
+                        <input type="checkbox" id="task1">
+                        <label for="task1"></label>
+                    </div>
+                    <div class="task-info">
+                        <p class="task-code">APP-182</p>
+                        <p class="task-title">Refactor autenticação middleware</p>
+                        <div class="task-meta">
+                            <span class="tag">Hoje</span>
+                            <span class="comment-count">4</span>
+                        </div>
+                    </div>
+                    <div class="task-assignee">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" alt="Avatar">
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-checkbox">
+                        <input type="checkbox" id="task2">
+                        <label for="task2"></label>
+                    </div>
+                    <div class="task-info">
+                        <p class="task-code">UT-44</p>
+                        <p class="task-title">Atualizar tokens de design para modo de alta densidade</p>
+                        <div class="task-meta">
+                            <span class="tag">Ontem</span>
+                            <span class="comment-count">12</span>
+                        </div>
+                    </div>
+                    <div class="task-assignee">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mike" alt="Avatar">
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-checkbox">
+                        <input type="checkbox" id="task3">
+                        <label for="task3"></label>
+                    </div>
+                    <div class="task-info">
+                        <p class="task-code">OPS-29</p>
+                        <p class="task-title">Otimização de pipeline CI/CD para serviços Python</p>
+                        <div class="task-meta">
+                            <span class="tag">24 Out</span>
+                            <span class="comment-count">2</span>
+                        </div>
+                    </div>
+                    <div class="task-assignee">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" alt="Avatar">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-section">
+            <h3>Atividade Recente</h3>
+
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-user">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" alt="Avatar">
+                    </div>
+                    <div class="activity-info">
+                        <p class="activity-text">
+                            <strong>Sarah K.</strong> moveu <strong>APP-182</strong> para <strong>Concluído</strong>
+                        </p>
+                        <p class="activity-time">há 14 minutos</p>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-user">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mike" alt="Avatar">
+                    </div>
+                    <div class="activity-info">
+                        <p class="activity-text">
+                            <strong>Mike L.</strong> comentou em <strong>OPS-29</strong>
+                        </p>
+                        <div class="activity-comment">
+                            <p>"I've updated the Dockerfile to use a multi-stage build. This should reduce the image
+                                size by 40%."</p>
+                        </div>
+                        <p class="activity-time">2 horas atrás</p>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-user">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" alt="Avatar">
+                    </div>
+                    <div class="activity-info">
+                        <p class="activity-text">
+                            <strong>Alex J.</strong> anexou 3 arquivos a <strong>UT-44</strong>
+                        </p>
+                        <div class="activity-files">
+                            <a href="#">
+                                <i class="fas fa-file-alt"></i>
+                            </a>
+                            <a href="#">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
+                        </div>
+                        <p class="activity-time">5 horas atrás</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}
