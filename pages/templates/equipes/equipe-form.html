@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/equipe.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h2>{% if object %}Editar Grupo{% else %}Criar Novo Grupo{% endif %}</h2>
+        <p class="text-muted">Configure um novo espaço de colaboração para sua equipe técnica.</p>
+    </div>
+
+    <div class="card p-4">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <h3 class="section-title"><i class="fas fa-info-circle"></i> Informações Básicas</h3>
+            {{ form.nome|as_crispy_field }}
+            {{ form.descricao|as_crispy_field }}
+
+            <h3 class="section-title mt-4"><i class="fas fa-lock"></i> Privacidade</h3>
+            <div class="privacy-wrapper">
+                {{ form.privacidade|as_crispy_field }}
+            </div>
+
+            <h3 class="section-title mt-4"><i class="fas fa-user-plus"></i> Selecionar Membros</h3>
+            <div class="members-selection-container" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; background: #f8fafc;">
+                {{ form.membros|as_crispy_field }}
+            </div>
+
+            <div class="form-actions mt-5 d-flex justify-content-end gap-3">
+                <a href="{% url 'equipes' %}" class="btn btn-light">Cancelar</a>
+                <button type="submit" class="btn-dark">{% if object %}Salvar Grupo{% else %}Criar Grupo{% endif %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/equipe.js' %}"></script>
+{% endblock %}

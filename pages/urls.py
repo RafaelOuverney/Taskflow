@@ -6,6 +6,7 @@ from .views import (
     SubTaskCreateAPI, SubTaskToggleAPI, SubTaskDeleteAPI, TasksGetListAPI,
     SobreView
 )
+from pages import views
 
 
 urlpatterns = [
@@ -37,4 +38,11 @@ urlpatterns = [
     path('api/subtask/create/', SubTaskCreateAPI.as_view(), name='subtask_create_api'),
     path('api/subtask/toggle/', SubTaskToggleAPI.as_view(), name='subtask_toggle_api'),
     path('api/subtask/delete/', SubTaskDeleteAPI.as_view(), name='subtask_delete_api'),
+
+    path('equipes/', views.EquipeListView.as_view(), name='equipes'), 
+    
+    path('equipes/nova/', views.EquipeCreateView.as_view(), name='equipe_create'),
+    path('equipes/<int:pk>/', views.EquipeDetailView.as_view(), name='equipe_detail'),
+    path('equipes/<int:pk>/editar/', views.EquipeUpdateView.as_view(), name='equipe_update'),
+    path('equipes/<int:pk>/excluir/', views.EquipeDeleteView.as_view(), name='equipe_delete'),
 ]

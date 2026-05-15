@@ -68,3 +68,29 @@ class SubTask(models.Model):
     
     def __str__(self):
         return self.title
+    
+class Equipe(models.Model):
+    PRIVACY_CHOICES = [
+        ('public', 'Público'),
+        ('private', 'Privado'),
+    ]
+    
+    nome = models.CharField(max_length=100, verbose_name="Nome do Grupo")
+    descricao = models.TextField(blank=True, verbose_name="Descrição")
+    privacidade = models.CharField(
+        max_length=10, 
+        choices=PRIVACY_CHOICES, 
+        default='private',
+        verbose_name="Privacidade"
+    )
+    
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_equipes')
+    membros = models.ManyToManyField(User, related_name='equipes', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return self.nome

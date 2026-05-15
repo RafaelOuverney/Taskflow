@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from .models import Equipe
 
 class UserUpdateForm(forms.ModelForm):
     class Meta:
@@ -16,3 +17,15 @@ class SecurityForm(forms.Form):
     current_password = forms.CharField(label='Current Password', widget=forms.PasswordInput)
     new_password = forms.CharField(label='New Password', widget=forms.PasswordInput)
     confirm_password = forms.CharField(label='Confirm New Password', widget=forms.PasswordInput)
+
+class EquipeForm(forms.ModelForm):
+    membros = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.CheckboxSelectMultiple, 
+        required=False,
+        label="Adicionar Membros (Selecione os usuários que farão parte da equipe)"
+    )
+
+    class Meta:
+        model = Equipe
+        fields = ['nome', 'descricao', 'privacidade', 'membros']

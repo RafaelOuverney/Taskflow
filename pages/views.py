@@ -1,7 +1,8 @@
 import json
 
 from django.http import JsonResponse
-from django.views.generic import TemplateView
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.contrib.auth import login, authenticate, logout
@@ -9,7 +10,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
 
-from pages.forms import ProfileUpdateForm, SecurityForm, UserUpdateForm
+from pages.forms import EquipeForm, ProfileUpdateForm, SecurityForm, UserUpdateForm
+from pages.models import Equipe
 
 class IndexView(TemplateView):
     template_name = 'index.html'
@@ -579,5 +581,44 @@ class PerfilView(TemplateView):
         context['password_form'] = SecurityForm()
 
         return context
+    
+class EquipeListView(LoginRequiredMixin, ListView):
+    model = Equipe
+    template_name = 'equipes/equipe-lista.html'
+    context_object_name = 'equipes'
+
+    def get_queryset(self):
+        from django.db.models import Q
+        return Equipe.objects.filter(Q(owner=self.request.user) | Q(membros=self.request.user)).distinct()
+
+class EquipeDetailView(LoginRequiredMixin, DetailView):
+    model = Equipe
+    template_name = 'equipes/equipe-detalhe.html' # Você precisará criar este HTML
+    context_object_name = 'equipe'
+
+class EquipeCreateView(LoginRequiredMixin, CreateView):
+    model = Equipe
+    form_class = EquipeForm
+    template_name = 'equipes/equipe-form.html'
+    success_url = reverse_lazy('equipes')
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        self.object = form.save()
+        
+        self.object.membros.add(self.request.user)
+        
+        return super().form_valid(form)
+
+class EquipeUpdateView(LoginRequiredMixin, UpdateView):
+    model = Equipe
+    form_class = EquipeForm
+    template_name = 'equipes/equipe-form.html'
+    success_url = reverse_lazy('equipes')
+
+class EquipeDeleteView(LoginRequiredMixin, DeleteView):
+    model = Equipe
+    template_name = 'equipes/equipe-confirm-delete.html'
+    success_url = reverse_lazy('equipes')
         
 
