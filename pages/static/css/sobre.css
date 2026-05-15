@@ -1,0 +1,90 @@
+/* static/css/sobre.css */
+
+.content-sobre {
+    /* O padding principal pode variar dependendo de como está o seu base.html */
+    padding: 40px 80px; 
+    background-color: #ffffff;
+}
+
+.about-hero {
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto 64px auto;
+}
+
+.badge {
+    display: inline-block;
+    background-color: #0f172a; /* Idealmente var(--primary-color) se declarado no CSS base */
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+
+.about-hero h2 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #0f172a;
+}
+
+.subtitle {
+    color: #475569;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+}
+
+.hero-image-container {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.history-section {
+    display: flex;
+    gap: 64px;
+    max-width: 1000px;
+    margin: 0 auto;
+    align-items: center;
+}
+
+.history-text {
+    flex: 1;
+}
+
+.history-text h3 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #0f172a;
+}
+
+.history-text p {
+    color: #475569;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    font-size: 15px;
+}
+
+.history-image {
+    flex: 1;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.history-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}

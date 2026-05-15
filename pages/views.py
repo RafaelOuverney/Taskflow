@@ -560,4 +560,7 @@ class TasksGetListAPI(LoginRequiredMixin, TemplateView):
                 'message': f'Erro ao buscar tarefas: {str(e)}'
             }, status=500)
         
+class SobreView(TemplateView):
+    template_name = 'sobre.html'
+        
 

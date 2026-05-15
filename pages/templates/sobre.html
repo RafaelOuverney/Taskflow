@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sobre - TaskFlow{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/sobre.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="content-sobre">
+    <div class="about-hero">
+        <span class="badge">Versão 2.4.0</span>
+        <h2>Sobre o TaskFlow</h2>
+        <p class="subtitle">
+            Desenvolvido para unificar a gestão de tarefas, o TaskFlow é a ferramenta perfeita para pequenas equipes que querem desenvolvimento ágil. Desenvolvido sem fins lucrativos utilizando as técnolgias Python e Django, ele combina simplicidade e poder em uma interface intuitiva. Com recursos como Kanban, cadernos de notas e dashboards personalizados, o TaskFlow é a escolha ideal para quem busca eficiência sem complicação.
+        </p>
+        
+        <div class="hero-image-container">
+            <!-- <img src="{% static 'img/hero-taskflow.jpg' %}" alt="Interface do TaskFlow" class="hero-image"> -->
+        </div>
+    </div>
+
+    <section class="history-section">
+        <div class="history-text">
+            <h3>Diagrama de classes</h3>
+            <p>
+                O diagrama de classes do TaskFlow é uma representação visual da estrutura do sistema, mostrando as principais classes, seus atributos e métodos, bem como as relações entre elas. Ele inclui classes como Usuario, Tarefa, Caderno e Dashboard, cada uma com suas responsabilidades específicas. O diagrama destaca como essas classes interagem para fornecer funcionalidades como gerenciamento de tarefas, organização de notas e personalização de dashboards, refletindo a arquitetura modular e orientada a objetos do TaskFlow.
+            </p>
+            <p>
+                Decidimos construir algo que falasse a nossa língua. Uma plataforma projetada para o desenvolvedor que valoriza a agilidade.
+            </p>
+        </div>
+        <div class="history-image">
+            <img src="{% static 'img/classe.png' %}" alt="Programadores codificando no escuro">
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/sobre.js' %}"></script>
+{% endblock %}

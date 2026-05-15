@@ -3,7 +3,8 @@ from .views import (
     DashboardView, IndexView, LogoutView, RecuperacaoView, CadastroView,
     NotebookListView, NotebookCreateAPI, NotebookSaveAPI, NotebookDeleteAPI, NotebookGetListAPI,
     TasksListView, TaskCreateAPI, TaskUpdateAPI, TaskToggleAPI, TaskDeleteAPI,
-    SubTaskCreateAPI, SubTaskToggleAPI, SubTaskDeleteAPI, TasksGetListAPI
+    SubTaskCreateAPI, SubTaskToggleAPI, SubTaskDeleteAPI, TasksGetListAPI,
+    SobreView
 )
 
 
@@ -13,6 +14,8 @@ urlpatterns = [
     path('cadastro/', CadastroView.as_view(), name='cadastro'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('sobre/', SobreView.as_view(), name='sobre'),
+
     
     path('caderno/', NotebookListView.as_view(), name='notebook'),
     path('caderno/<int:notebook_id>/', NotebookListView.as_view(), name='notebook_detail'),

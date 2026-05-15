@@ -125,6 +125,9 @@
             <a href="#" class="user-menu-item">
                 <i class="fas fa-key"></i> Alterar Senha
             </a>
+            <a href="{% url 'sobre' %}" class="user-menu-item {% if request.resolver_match.url_name == 'sobre' %}active{% endif %}">
+                <i class="fas fa-file-alt"></i> Sobre o TaskFlow
+            </a>
             <div class="user-menu-divider"></div>
             <a href="{% url 'logout' %}" class="user-menu-item logout">
                 <i class="fas fa-sign-out-alt"></i> Sair
