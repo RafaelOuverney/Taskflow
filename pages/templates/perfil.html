@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block title %}Perfil - TaskFlow{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    
+    <div class="profile-header card">
+        <div class="avatar-wrapper">
+            <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}https://ui-avatars.com/api/?name={{ user.first_name }}+{{ user.last_name }}&background=0D8ABC&color=fff{% endif %}" alt="Avatar" id="avatarPreview">
+            <button class="upload-btn" id="uploadAvatarBtn"><i class="fas fa-upload"></i></button>
+        </div>
+        <div class="profile-title">
+            <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+            <p><span class="badge">@{{ user.username }}</span> &bull; {{ user.email|default:user.email }}</p>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="profile-form-grid">
+        {% csrf_token %}
+        
+        <input type="file" id="avatarInput" name="avatar" accept="image/*" style="display: none;">
+
+        <div class="left-column">
+            <div class="card form-section">
+                <h3><i class="fas fa-user"></i> Informações Pessoais</h3>
+                
+                {{ user_form.first_name|as_crispy_field }}
+                {{ user_form.last_name|as_crispy_field }}
+                {{ user_form.email|as_crispy_field }}
+                {{ profile_form.phone_number|as_crispy_field }}
+                {{ profile_form.bio|as_crispy_field }}
+            </div>
+        </div>
+
+        <div class="right-column">
+            
+            <div class="card form-section">
+                <h3><i class="fas fa-sliders-h"></i> Account Settings</h3>
+                
+                <div class="settings-row">
+                    <label>Language</label>
+                    {{ profile_form.language|as_crispy_field }}
+                </div>
+                
+                <div class="settings-row">
+                    <label>Timezone</label>
+                    {{ profile_form.timezone|as_crispy_field }}
+                </div>
+
+            </div>
+
+            <div class="card form-section">
+                <h3><i class="fas fa-shield-alt"></i> Security</h3>
+                
+                {{ password_form.current_password|as_crispy_field }}
+                {{ password_form.new_password|as_crispy_field }}
+                {{ password_form.confirm_password|as_crispy_field }}
+
+                <div class="toggle-row mt-4">
+                    <div>
+                        <strong>Two-Factor Authentication</strong>
+                        <p class="text-muted">Secure your account with 2FA</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="two_factor" {% if user.profile.two_factor %}checked{% endif %}>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'dashboard' %}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/perfil.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,257 @@
+/* static/css/perfil.css */
+
+.profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 32px 0;
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+/* HEADER */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.avatar-wrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.upload-btn {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background-color: #0f172a;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.upload-btn:hover {
+    background-color: #1e293b;
+}
+
+.profile-title h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.profile-title p {
+    color: #64748b;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge {
+    background-color: #e0e7ff;
+    color: #4f46e5;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-weight: 600;
+}
+
+/* FORM GRID */
+.profile-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+}
+
+.form-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 16px;
+}
+
+/* Ajustes para os campos do Crispy Forms ficarem com a cara do seu design */
+.form-group {
+    margin-bottom: 32px;
+}
+
+.form-control, .form-select {
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #94a3b8;
+    background-color: #ffffff;
+}
+
+/* THEME TOGGLE */
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.theme-toggle {
+    display: flex;
+    background-color: #f1f5f9;
+    border-radius: 20px;
+    overflow: hidden;
+    padding: 4px;
+}
+
+.theme-toggle input[type="radio"] {
+    display: none;
+}
+
+.theme-toggle label {
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 16px;
+    color: #64748b;
+    transition: 0.3s;
+}
+
+.theme-toggle input[type="radio"]:checked + label {
+    background-color: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* TOGGLE SWITCH (2FA) */
+.toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.text-muted {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #cbd5e1;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #4f46e5;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* ACTIONS */
+.form-actions {
+    grid-column: 1 / -1; /* Ocupa as duas colunas */
+    display: flex;
+    justify-content: flex-end;
+    gap: 25px;
+    margin-top: 8px;
+}
+
+.btn-cancel {
+    padding: 10px 24px;
+    font-weight: 600;
+    color: #475569;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.btn-cancel:hover {
+    background-color: #f1f5f9;
+}
+
+.btn-save {
+    background-color: #0f172a;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-save:hover {
+    background-color: #1e293b;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .profile-form-grid {
+        grid-template-columns: 1fr;
+    }
+}

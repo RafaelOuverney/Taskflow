@@ -9,6 +9,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
 
+from pages.forms import ProfileUpdateForm, SecurityForm, UserUpdateForm
+
 class IndexView(TemplateView):
     template_name = 'index.html'
     
@@ -562,5 +564,20 @@ class TasksGetListAPI(LoginRequiredMixin, TemplateView):
         
 class SobreView(TemplateView):
     template_name = 'sobre.html'
+
+class PerfilView(TemplateView):
+    template_name = 'perfil.html' 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['user_form'] = UserUpdateForm(instance=self.request.user)
+        else:
+            context['user_form'] = UserUpdateForm()
+            
+        context['profile_form'] = ProfileUpdateForm()
+        context['password_form'] = SecurityForm()
+
+        return context
         
 

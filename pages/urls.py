@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    DashboardView, IndexView, LogoutView, RecuperacaoView, CadastroView,
+    DashboardView, IndexView, LogoutView, PerfilView, RecuperacaoView, CadastroView,
     NotebookListView, NotebookCreateAPI, NotebookSaveAPI, NotebookDeleteAPI, NotebookGetListAPI,
     TasksListView, TaskCreateAPI, TaskUpdateAPI, TaskToggleAPI, TaskDeleteAPI,
     SubTaskCreateAPI, SubTaskToggleAPI, SubTaskDeleteAPI, TasksGetListAPI,
@@ -15,6 +15,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('sobre/', SobreView.as_view(), name='sobre'),
+    path('perfil/', PerfilView.as_view(), name='perfil'),
 
     
     path('caderno/', NotebookListView.as_view(), name='notebook'),
