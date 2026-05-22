@@ -4,7 +4,7 @@ from .views import (
     NotebookListView, NotebookCreateAPI, NotebookSaveAPI, NotebookDeleteAPI, NotebookGetListAPI,
     TasksListView, TaskCreateAPI, TaskUpdateAPI, TaskToggleAPI, TaskDeleteAPI,
     SubTaskCreateAPI, SubTaskToggleAPI, SubTaskDeleteAPI, TasksGetListAPI,
-    SobreView
+    CalendarView, SobreView
 )
 from pages import views
 
@@ -28,6 +28,8 @@ urlpatterns = [
     path('api/notebook/list/', NotebookGetListAPI.as_view(), name='notebook_list_api'),
     
     path('tarefas/', TasksListView.as_view(), name='tarefas'),
+    
+    path('calendario/', CalendarView.as_view(), name='calendario'),
     
     path('api/task/create/', TaskCreateAPI.as_view(), name='task_create_api'),
     path('api/task/update/', TaskUpdateAPI.as_view(), name='task_update_api'),

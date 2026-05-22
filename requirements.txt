@@ -4,3 +4,4 @@ crispy-forms==2.6
 crispy-bootstrap5==2.0.2
 python-dotenv==1.0.0
 dj-database-url==2.1.0
+argon2-cffi==23.1.0

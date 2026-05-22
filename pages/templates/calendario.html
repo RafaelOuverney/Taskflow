@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Calendário - TaskFlow{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/calendario.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="calendar-container">
+    <div class="calendar-header">
+        <div class="calendar-title-section">
+            <h1>Calendário</h1>
+            <p class="calendar-subtitle">Visualize suas tarefas por data</p>
+        </div>
+        
+        <div class="calendar-controls">
+            <button class="calendar-nav-btn" id="prevMonth" title="Mês anterior">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="current-month-year" id="currentMonthYear"></div>
+            <button class="calendar-nav-btn" id="nextMonth" title="Próximo mês">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="btn-today" id="todayBtn" title="Ir para hoje">
+                <i class="fas fa-calendar-day"></i> Hoje
+            </button>
+        </div>
+    </div>
+
+    <div class="calendar-content">
+        <div class="calendar-main">
+            <div class="calendar-weekdays">
+                <div class="weekday">DOM</div>
+                <div class="weekday">SEG</div>
+                <div class="weekday">TER</div>
+                <div class="weekday">QUA</div>
+                <div class="weekday">QUI</div>
+                <div class="weekday">SEX</div>
+                <div class="weekday">SÁB</div>
+            </div>
+            
+            <div class="calendar-days" id="calendarDays"></div>
+        </div>
+
+        <aside class="calendar-sidebar">
+            <div class="sidebar-section selected-date-section">
+                <h3>Data Selecionada</h3>
+                <div class="selected-date" id="selectedDate">
+                    <span class="selected-date-text" id="selectedDateText">-</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section tasks-section">
+                <div class="tasks-header">
+                    <h3>Tarefas do Dia</h3>
+                    <button class="btn-new-task" id="btnNewTaskCalendar" title="Nova tarefa">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                
+                <div class="tasks-list" id="tasksListCalendar">
+                    <p class="empty-message">Selecione um dia para ver as tarefas</p>
+                </div>
+            </div>
+
+            <div class="sidebar-section upcoming-section">
+                <h3>Próximos Prazos</h3>
+                <div class="upcoming-list" id="upcomingList"></div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- Modal para criar/editar tarefa -->
+<div class="modal fade" id="taskModalCalendar" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskModalLabel">Nova Tarefa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="taskFormCalendar">
+                    <div class="mb-3">
+                        <label for="taskTitle" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="taskTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskDescription" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="taskDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskPriority" class="form-label">Prioridade</label>
+                        <select class="form-select" id="taskPriority">
+                            <option value="low">Baixa</option>
+                            <option value="medium" selected>Média</option>
+                            <option value="high">Alta</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskDueDate" class="form-label">Data de Vencimento</label>
+                        <input type="datetime-local" class="form-control" id="taskDueDate" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveTaskBtn">Salvar Tarefa</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/calendario.js' %}"></script>
+{% endblock %}

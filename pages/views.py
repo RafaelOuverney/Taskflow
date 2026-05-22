@@ -563,6 +563,19 @@ class TasksGetListAPI(LoginRequiredMixin, TemplateView):
                 'success': False,
                 'message': f'Erro ao buscar tarefas: {str(e)}'
             }, status=500)
+
+
+class CalendarView(LoginRequiredMixin, TemplateView):
+    template_name = 'calendario.html'
+    login_url = 'index'
+    
+    def get_context_data(self, **kwargs):
+        from .models import Task
+        context = super().get_context_data(**kwargs)
+        context['user_name'] = self.request.user.first_name or self.request.user.email
+        context['tasks'] = Task.objects.filter(owner=self.request.user)
+        return context
+
         
 class SobreView(TemplateView):
     template_name = 'sobre.html'

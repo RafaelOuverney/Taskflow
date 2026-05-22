@@ -65,7 +65,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link">
+                    <a href="{% url 'calendario' %}" class="nav-link {% if request.resolver_match.url_name == 'calendario' %}active{% endif %}">
                         <i class="fas fa-calendar-alt"></i>
                         <span>Calendário</span>
                     </a>
