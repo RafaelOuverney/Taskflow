@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/equipe.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 600px;">
+    <div class="card p-5 text-center">
+        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+        <h2 class="mb-3">Confirmar Exclusão</h2>
+        <p class="text-muted mb-4">
+            Você tem certeza que deseja excluir a equipe <strong class="text-dark">"{{ equipe.nome }}"</strong>? <br>
+            Esta ação não poderá ser desfeita e todos os dados associados a esta equipe serão perdidos.
+        </p>
+        
+        <form method="POST" class="d-flex justify-content-center gap-3">
+            {% csrf_token %}
+            <a href="{% url 'equipe_detail' equipe.id %}" class="btn btn-light px-4">Cancelar</a>
+            <button type="submit" class="btn btn-danger px-4">Sim, Excluir Equipe</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

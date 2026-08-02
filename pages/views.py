@@ -1,5 +1,8 @@
 import json
 
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.views import View
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
@@ -9,6 +12,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from pages.forms import EquipeForm, ProfileUpdateForm, SecurityForm, UserUpdateForm
 from pages.models import Equipe
@@ -580,20 +584,47 @@ class CalendarView(LoginRequiredMixin, TemplateView):
 class SobreView(TemplateView):
     template_name = 'sobre.html'
 
-class PerfilView(TemplateView):
-    template_name = 'perfil.html' 
+class PerfilView(LoginRequiredMixin, TemplateView):
+    template_name = 'perfil.html'
+    login_url = 'index' 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            context['user_form'] = UserUpdateForm(instance=self.request.user)
-        else:
-            context['user_form'] = UserUpdateForm()
-            
+        context['user_form'] = UserUpdateForm(instance=self.request.user)
         context['profile_form'] = ProfileUpdateForm()
         context['password_form'] = SecurityForm()
-
         return context
+
+class AlterarSenhaView(LoginRequiredMixin, View):
+    def post(self, request):
+        form = SecurityForm(request.POST)
+        if form.is_valid():
+            current_password = form.cleaned_data.get('current_password')
+            new_password = form.cleaned_data.get('new_password')
+            confirm_password = form.cleaned_data.get('confirm_password')
+
+            if not request.user.check_password(current_password):
+                messages.error(request, 'A senha atual está incorreta.')
+                return redirect('perfil')
+
+            if new_password != confirm_password:
+                messages.error(request, 'A nova senha e a confirmação não coincidem.')
+                return redirect('perfil')
+                
+            if len(new_password) < 8:
+                messages.error(request, 'A nova senha deve ter pelo menos 8 caracteres.')
+                return redirect('perfil')
+
+            request.user.set_password(new_password)
+            request.user.save()
+            
+            update_session_auth_hash(request, request.user)
+            
+            messages.success(request, 'Sua senha foi alterada com sucesso!')
+        else:
+            messages.error(request, 'Erro ao alterar a senha. Verifique os campos.')
+            
+        return redirect('perfil')
     
 class EquipeListView(LoginRequiredMixin, ListView):
     model = Equipe
@@ -601,13 +632,19 @@ class EquipeListView(LoginRequiredMixin, ListView):
     context_object_name = 'equipes'
 
     def get_queryset(self):
-        from django.db.models import Q
-        return Equipe.objects.filter(Q(owner=self.request.user) | Q(membros=self.request.user)).distinct()
+        return Equipe.objects.filter(
+            Q(owner=self.request.user) | Q(membros=self.request.user)
+        ).distinct()
 
 class EquipeDetailView(LoginRequiredMixin, DetailView):
     model = Equipe
-    template_name = 'equipes/equipe-detalhe.html' # Você precisará criar este HTML
+    template_name = 'equipes/equipe-detalhe.html'
     context_object_name = 'equipe'
+
+    def get_queryset(self):
+        return Equipe.objects.filter(
+            Q(owner=self.request.user) | Q(membros=self.request.user)
+        ).distinct()
 
 class EquipeCreateView(LoginRequiredMixin, CreateView):
     model = Equipe
@@ -618,9 +655,7 @@ class EquipeCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.owner = self.request.user
         self.object = form.save()
-        
         self.object.membros.add(self.request.user)
-        
         return super().form_valid(form)
 
 class EquipeUpdateView(LoginRequiredMixin, UpdateView):
@@ -629,9 +664,15 @@ class EquipeUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'equipes/equipe-form.html'
     success_url = reverse_lazy('equipes')
 
+    def get_queryset(self):
+        return Equipe.objects.filter(owner=self.request.user)
+
 class EquipeDeleteView(LoginRequiredMixin, DeleteView):
     model = Equipe
     template_name = 'equipes/equipe-confirm-delete.html'
     success_url = reverse_lazy('equipes')
+
+    def get_queryset(self):
+        return Equipe.objects.filter(owner=self.request.user)
         
 

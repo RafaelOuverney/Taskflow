@@ -8,11 +8,25 @@
 {% endblock %}
 
 {% block content %}
+{% if messages %}
+<div style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert"
+        style="min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px;">
+        {% if message.tags == 'success' %}<i class="fas fa-check-circle me-2"></i>{% else %}<i
+            class="fas fa-exclamation-circle me-2"></i>{% endif %}
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 <div class="profile-container">
-    
     <div class="profile-header card">
         <div class="avatar-wrapper">
-            <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}https://ui-avatars.com/api/?name={{ user.first_name }}+{{ user.last_name }}&background=0D8ABC&color=fff{% endif %}" alt="Avatar" id="avatarPreview">
+            <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}https://ui-avatars.com/api/?name={{ user.first_name }}+{{ user.last_name }}&background=0D8ABC&color=fff{% endif %}"
+                alt="Avatar" id="avatarPreview">
             <button class="upload-btn" id="uploadAvatarBtn"><i class="fas fa-upload"></i></button>
         </div>
         <div class="profile-title">
@@ -23,13 +37,11 @@
 
     <form method="POST" enctype="multipart/form-data" class="profile-form-grid">
         {% csrf_token %}
-        
         <input type="file" id="avatarInput" name="avatar" accept="image/*" style="display: none;">
 
         <div class="left-column">
             <div class="card form-section">
                 <h3><i class="fas fa-user"></i> Informações Pessoais</h3>
-                
                 {{ user_form.first_name|as_crispy_field }}
                 {{ user_form.last_name|as_crispy_field }}
                 {{ user_form.email|as_crispy_field }}
@@ -39,25 +51,30 @@
         </div>
 
         <div class="right-column">
-            
             <div class="card form-section">
                 <h3><i class="fas fa-sliders-h"></i> Account Settings</h3>
-                
                 <div class="settings-row">
                     <label>Language</label>
                     {{ profile_form.language|as_crispy_field }}
                 </div>
-                
                 <div class="settings-row">
                     <label>Timezone</label>
                     {{ profile_form.timezone|as_crispy_field }}
                 </div>
-
             </div>
+        </div>
 
+        <div class="form-actions">
+            <a href="{% url 'dashboard' %}" class="btn-cancel">Cancelar</a>
+            <button type="submit" class="btn-save">Salvar Alterações</button>
+        </div>
+    </form>
+
+    <form method="POST" action="{% url 'alterar_senha' %}" class="profile-form-grid" style="margin-top: 24px;">
+        {% csrf_token %}
+        <div class="right-column" style="grid-column: 1 / -1;">
             <div class="card form-section">
-                <h3><i class="fas fa-shield-alt"></i> Security</h3>
-                
+                <h3><i class="fas fa-shield-alt"></i> Segurança (Alterar Senha)</h3>
                 {{ password_form.current_password|as_crispy_field }}
                 {{ password_form.new_password|as_crispy_field }}
                 {{ password_form.confirm_password|as_crispy_field }}
@@ -72,12 +89,11 @@
                         <span class="slider round"></span>
                     </label>
                 </div>
-            </div>
-        </div>
 
-        <div class="form-actions">
-            <a href="{% url 'dashboard' %}" class="btn-cancel">Cancel</a>
-            <button type="submit" class="btn-save">Save Changes</button>
+                <div class="form-actions" style="margin-top: 16px;">
+                    <button type="submit" class="btn-save">Atualizar Senha</button>
+                </div>
+            </div>
         </div>
     </form>
 </div>

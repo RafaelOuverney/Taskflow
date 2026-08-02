@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +14,9 @@
     <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
+    {% if user.is_authenticated %}
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo">
@@ -29,7 +32,8 @@
         <nav class="sidebar-nav">
             <ul>
                 <li>
-                    <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <a href="{% url 'dashboard' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                         <i class="fas fa-chart-line"></i>
                         <span>Dashboard</span>
                     </a>
@@ -47,13 +51,15 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'notebook' %}" class="nav-link {% if request.resolver_match.url_name == 'notebook' or request.resolver_match.url_name == 'notebook_detail' %}active{% endif %}">
+                    <a href="{% url 'notebook' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'notebook' or request.resolver_match.url_name == 'notebook_detail' %}active{% endif %}">
                         <i class="fas fa-book"></i>
                         <span>Caderno</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'tarefas' %}" class="nav-link {% if request.resolver_match.url_name == 'tarefas' %}active{% endif %}">
+                    <a href="{% url 'tarefas' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'tarefas' %}active{% endif %}">
                         <i class="fas fa-tasks"></i>
                         <span>Tarefas</span>
                     </a>
@@ -65,7 +71,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'calendario' %}" class="nav-link {% if request.resolver_match.url_name == 'calendario' %}active{% endif %}">
+                    <a href="{% url 'calendario' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'calendario' %}active{% endif %}">
                         <i class="fas fa-calendar-alt"></i>
                         <span>Calendário</span>
                     </a>
@@ -84,8 +91,10 @@
             </a>
         </div>
     </aside>
+    {% endif %}
 
     <main class="main-content">
+        {% if user.is_authenticated %}
         <header class="top-header">
             <div class="search-bar">
                 <i class="fas fa-search"></i>
@@ -118,16 +127,18 @@
                 </div>
             </div>
             <div class="user-menu-divider"></div>
-            <a href="{% url 'perfil' %}" class="user-menu-item {% if request.resolver_match.url_name == 'perfil' %}active{% endif %}">
+            <a href="{% url 'perfil' %}"
+                class="user-menu-item {% if request.resolver_match.url_name == 'perfil' %}active{% endif %}">
                 <i class="fas fa-user"></i> Meu Perfil
             </a>
             <a href="#" class="user-menu-item">
                 <i class="fas fa-cog"></i> Configurações da Conta
             </a>
-            <a href="#" class="user-menu-item">
+            <a href="{% url 'perfil' %}#seguranca" class="user-menu-item">
                 <i class="fas fa-key"></i> Alterar Senha
             </a>
-            <a href="{% url 'sobre' %}" class="user-menu-item {% if request.resolver_match.url_name == 'sobre' %}active{% endif %}">
+            <a href="{% url 'sobre' %}"
+                class="user-menu-item {% if request.resolver_match.url_name == 'sobre' %}active{% endif %}">
                 <i class="fas fa-file-alt"></i> Sobre o TaskFlow
             </a>
             <div class="user-menu-divider"></div>
@@ -135,6 +146,7 @@
                 <i class="fas fa-sign-out-alt"></i> Sair
             </a>
         </div>
+        {% endif %}
 
         <div class="page-content">
             {% block content %}{% endblock %}
@@ -144,4 +156,5 @@
     <script src="{% static 'js/base.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
+
 </html>

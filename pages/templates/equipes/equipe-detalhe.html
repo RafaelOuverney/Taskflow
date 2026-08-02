@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/equipe.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header mb-4">
+        <a href="{% url 'equipes' %}" class="text-muted text-decoration-none d-inline-flex align-items-center gap-2 mb-3">
+            <i class="fas fa-arrow-left"></i> Voltar para Equipes
+        </a>
+        <h2>{{ equipe.nome }}</h2>
+        <p class="text-muted">{{ equipe.descricao|default:"Sem descrição" }}</p>
+    </div>
+
+    <div class="card p-4 mb-4">
+        <h3 class="section-title"><i class="fas fa-info-circle"></i> Informações da Equipe</h3>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <p><strong>Privacidade:</strong> 
+                    {% if equipe.privacidade == 'private' %}
+                        <span class="badge bg-secondary">Privado</span>
+                    {% else %}
+                        <span class="badge bg-success">Público</span>
+                    {% endif %}
+                </p>
+                <p><strong>Criado por:</strong> {{ equipe.owner.first_name }} {{ equipe.owner.last_name }} ({{ equipe.owner.email }})</p>
+                <p><strong>Criado em:</strong> {{ equipe.created_at|date:"d/m/Y H:i" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-4 mb-4">
+        <h3 class="section-title"><i class="fas fa-users"></i> Membros ({{ equipe.membros.count }})</h3>
+        <ul class="list-group mt-3">
+            {% for membro in equipe.membros.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="https://ui-avatars.com/api/?name={{ membro.first_name }}+{{ membro.last_name }}&background=0D8ABC&color=fff" alt="Avatar" width="32" height="32" class="rounded-circle">
+                        <span>{{ membro.first_name }} {{ membro.last_name }} <small class="text-muted">({{ membro.email }})</small></span>
+                    </div>
+                    {% if membro == equipe.owner %}
+                        <span class="badge bg-primary rounded-pill">Owner</span>
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li class="list-group-item text-muted">Nenhum membro adicionado.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="form-actions mt-4 d-flex justify-content-end gap-3">
+        <a href="{% url 'equipe_update' equipe.id %}" class="btn-dark"><i class="fas fa-edit"></i> Editar Equipe</a>
+        <a href="{% url 'equipe_delete' equipe.id %}" class="btn btn-danger"><i class="fas fa-trash"></i> Excluir Equipe</a>
+    </div>
+</div>
+{% endblock %}
