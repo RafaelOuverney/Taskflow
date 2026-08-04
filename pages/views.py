@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 
 from pages.forms import EquipeForm, ProfileUpdateForm, SecurityForm, UserUpdateForm
-from pages.models import Equipe, Notebook
+from pages.models import Equipe, Notebook, Task, Task
 
 class IndexView(TemplateView):
     template_name = 'index.html'
@@ -158,8 +158,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user_name'] = self.request.user.first_name or self.request.user.email
+        
+        context['tarefas_recentes'] = Task.objects.filter(owner=self.request.user).order_by('-created_at')[:5]
+        context['minhas_equipes'] = Equipe.objects.filter(membros=self.request.user).order_by('-created_at')[:3]
         return context
-
 class NotebookListView(LoginRequiredMixin, ListView):
     model = Notebook
     template_name = 'caderno.html'
@@ -291,7 +293,10 @@ class NotebookGetListAPI(LoginRequiredMixin, TemplateView):
             }, status=500)
 
 
-class TasksListView(LoginRequiredMixin, TemplateView):
+class TasksListView(LoginRequiredMixin, ListView):
+    model = Task
+    context_object_name = 'tasks'
+    paginate_by = 5
     template_name = 'tarefas.html'
     login_url = 'index'
     
