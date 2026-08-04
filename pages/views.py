@@ -300,11 +300,12 @@ class TasksListView(LoginRequiredMixin, ListView):
     template_name = 'tarefas.html'
     login_url = 'index'
     
+    def get_queryset(self):
+        return Task.objects.filter(owner=self.request.user)
+    
     def get_context_data(self, **kwargs):
-        from .models import Task
         context = super().get_context_data(**kwargs)
         context['user_name'] = self.request.user.first_name or self.request.user.email
-        context['tasks'] = Task.objects.filter(owner=self.request.user)
         return context
 
 
