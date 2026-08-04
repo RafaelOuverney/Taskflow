@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 
 from pages.forms import EquipeForm, ProfileUpdateForm, SecurityForm, UserUpdateForm
-from pages.models import Equipe
+from pages.models import Equipe, Notebook
 
 class IndexView(TemplateView):
     template_name = 'index.html'
@@ -160,89 +160,89 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['user_name'] = self.request.user.first_name or self.request.user.email
         return context
 
-class NotebookListView(LoginRequiredMixin, TemplateView):
+class NotebookListView(LoginRequiredMixin, ListView):
+    model = Notebook
     template_name = 'caderno.html'
+    context_object_name = 'notebooks'
     login_url = 'index'
     
+    def get_queryset(self):
+        return Notebook.objects.filter(owner=self.request.user)
+    
     def get_context_data(self, **kwargs):
-        from .models import Notebook
         context = super().get_context_data(**kwargs)
-        
         notebook_id = self.kwargs.get('notebook_id')
-        if notebook_id:
-            try:
-                notebook = Notebook.objects.get(id=notebook_id, owner=self.request.user)
-                context['notebook'] = notebook
-            except Notebook.DoesNotExist:
-                context['notebook'] = None
-        else:
-            latest = Notebook.objects.filter(owner=self.request.user).first()
-            context['notebook'] = latest
         
-        context['notebooks'] = Notebook.objects.filter(owner=self.request.user)
+        if notebook_id:
+            context['notebook'] = self.get_queryset().filter(id=notebook_id).first()
+        else:
+            context['notebook'] = self.get_queryset().first()
+            
         return context
 
 
-class NotebookCreateAPI(LoginRequiredMixin, TemplateView):
-    @method_decorator(csrf_protect)
-    def post(self, request):
-        from .models import Notebook
+class NotebookCreateAPI(LoginRequiredMixin, CreateView):
+    model = Notebook
+    fields = ['title'] 
+    
+    def post(self, request, *args, **kwargs):
         try:
             data = json.loads(request.body)
-            title = data.get('title', 'Novo Caderno').strip()
-            
-            notebook = Notebook.objects.create(
-                title=title,
-                owner=request.user,
-                content=''
-            )
-            
-            return JsonResponse({
-                'success': True,
-                'message': 'Caderno criado com sucesso!',
-                'notebook': {
-                    'id': notebook.id,
-                    'title': notebook.title,
-                    'content': notebook.content
-                }
-            })
-        except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'message': f'Erro ao criar caderno: {str(e)}'
-            }, status=500)
+            request.POST = request.POST.copy()
+            request.POST.update(data)
+        except json.JSONDecodeError:
+            pass
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        self.object = form.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Caderno criado com sucesso!',
+            'notebook': {
+                'id': self.object.id,
+                'title': self.object.title,
+                'content': self.object.content
+            }
+        })
+
+    def form_invalid(self, form):
+        return JsonResponse({
+            'success': False,
+            'message': 'Erro de validação do formulário.'
+        }, status=400)
 
 
-class NotebookSaveAPI(LoginRequiredMixin, TemplateView):
-    @method_decorator(csrf_protect)
-    def post(self, request):
-        from .models import Notebook
+class NotebookSaveAPI(LoginRequiredMixin, UpdateView):
+    model = Notebook
+    fields = ['title', 'content']
+    
+    def get_queryset(self):
+        return Notebook.objects.filter(owner=self.request.user)
+
+    def get_object(self, queryset=None):
+        notebook_id = self.request.POST.get('notebook_id')
+        return self.get_queryset().get(id=notebook_id)
+
+    def post(self, request, *args, **kwargs):
         try:
             data = json.loads(request.body)
-            notebook_id = data.get('notebook_id')
-            title = data.get('title', '').strip()
-            content = data.get('content', '')
-            
-            notebook = Notebook.objects.get(id=notebook_id, owner=request.user)
-            notebook.title = title
-            notebook.content = content
-            notebook.save()
-            
-            return JsonResponse({
-                'success': True,
-                'message': 'Caderno salvo com sucesso!',
-                'updated_at': notebook.updated_at.strftime('%d/%m/%Y %H:%M')
-            })
-        except Notebook.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'message': 'Caderno não encontrado.'
-            }, status=404)
-        except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'message': f'Erro ao salvar caderno: {str(e)}'
-            }, status=500)
+            request.POST = request.POST.copy()
+            request.POST.update(data)
+        except json.JSONDecodeError:
+            pass
+        self.object = self.get_object()
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object = form.save()
+        return JsonResponse({
+            'success': True,
+            'message': 'Caderno salvo com sucesso!',
+            'updated_at': self.object.updated_at.strftime('%d/%m/%Y %H:%M')
+        })
 
 
 class NotebookDeleteAPI(LoginRequiredMixin, TemplateView):
