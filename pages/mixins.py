@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 
+
 class GroupRequiredMixin(UserPassesTestMixin):
     group_required = None 
 
