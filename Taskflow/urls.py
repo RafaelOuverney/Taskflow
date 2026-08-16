@@ -18,9 +18,13 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
+from pages.views import AnaliseView, CalendarView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pages.urls')),
+    path('calendario/', CalendarView.as_view(), name='calendario'),
+    path('analise/', AnaliseView.as_view(), name='analise'),
 ]
 
 if settings.DEBUG:

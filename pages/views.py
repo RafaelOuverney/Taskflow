@@ -1,3 +1,4 @@
+from enum import member
 import json
 from datetime import timedelta
 
@@ -23,6 +24,7 @@ from django.views.generic import (
 )
 
 from pages.forms import EquipeForm, ProfileUpdateForm, SecurityForm, UserUpdateForm
+from pages.mixins import GroupRequiredMixin
 from pages.models import Equipe, Notebook, Task
 
 
@@ -199,7 +201,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         minhas_equipes = Equipe.objects.filter(membros=user).order_by("-updated_at")[:3]
 
         hoje = timezone.now().date()
-        dias_semana = [ "SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"]
+        dias_semana = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"]
         tarefas_por_dia = []
 
         max_value = 1
@@ -767,3 +769,82 @@ class EquipeDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Equipe.objects.filter(owner=self.request.user)
+
+
+class AnaliseView(LoginRequiredMixin, TemplateView):
+    """
+    Página de Análise: apresenta a análise do grupo quanto às tarefas.
+    Restrita aos líderes (owners) das equipes.
+    """
+
+    template_name = "analise.html"
+    login_url = "index"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        equipes_lideradas = Equipe.objects.filter(owner=user)
+
+        equipe_id = self.request.GET.get("equipe")
+        equipe_selecionada = (
+            equipes_lideradas.filter(id=equipe_id).first() if equipe_id else None
+        )
+        equipe_selecionada = equipe_selecionada or equipes_lideradas.first()
+
+        total_tarefas = 0
+        concluidas = 0
+        pendentes = 0
+        prioridades = {"high": 0, "medium": 0, "low": 0}
+        analise_membros = []
+
+        if equipe_selecionada:
+            membros = equipe_selecionada.membros.all()
+            tarefas_equipe = Task.objects.filter(owner__in=membros).select_related(
+                "owner"
+            )
+
+            total_tarefas = tarefas_equipe.count()
+            concluidas = tarefas_equipe.filter(completed=True).count()
+            pendentes = total_tarefas - concluidas
+
+            for nivel in prioridades:
+                prioridades[nivel] = tarefas_equipe.filter(priority=nivel).count()
+
+            for membro in membros:
+                tarefas_membro = tarefas_equipe.filter(
+                    owner=membro
+                )  
+                m_total = tarefas_membro.count()
+                m_concluidas = tarefas_membro.filter(completed=True).count()
+                analise_membros.append(
+                    {
+                        "nome": membro.first_name or membro.username,
+                        "email": membro.email,
+                        "total": m_total,
+                        "concluidas": m_concluidas,
+                        "pendentes": m_total - m_concluidas,
+                        "percentual": round((m_concluidas / m_total) * 100)
+                        if m_total
+                        else 0,
+                        "eh_lider": membro == equipe_selecionada.owner,
+                    }
+                )
+
+            analise_membros.sort(key=lambda m: m["percentual"], reverse=True)
+
+        context.update(
+            {
+                "minhas_equipes": equipes_lideradas,
+                "equipe_selecionada": equipe_selecionada,
+                "total_tarefas": total_tarefas,
+                "concluidas": concluidas,
+                "pendentes": pendentes,
+                "taxa_conclusao": round((concluidas / total_tarefas) * 100)
+                if total_tarefas
+                else 0,
+                "prioridades": prioridades,
+                "analise_membros": analise_membros,
+            }
+        )
+        return context

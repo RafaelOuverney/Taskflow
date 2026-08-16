@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Análise - TaskFlow{% endblock %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/analise.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="analise-header">
+    <div class="dashboard-title">
+        <h1>Análise do Grupo</h1>
+        <p>Desempenho da equipe quanto às tarefas dos seus membros.</p>
+    </div>
+    {% if minhas_equipes %}
+    <form method="GET">
+        <select name="equipe" class="analise-select" onchange="this.form.submit()">
+            {% for equipe in minhas_equipes %}
+            <option value="{{ equipe.id }}" {% if equipe == equipe_selecionada %}selected{% endif %}>
+                {{ equipe.nome }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+    {% endif %}
+</div>
+
+{% if equipe_selecionada %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-body">
+            <p class="stat-label">Total de Tarefas do Grupo</p>
+            <h3 class="stat-value">{{ total_tarefas }}</h3>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-body">
+            <p class="stat-label">Concluídas</p>
+            <h3 class="stat-value">{{ concluidas }}</h3>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-body">
+            <p class="stat-label">Pendentes</p>
+            <h3 class="stat-value">{{ pendentes }}</h3>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-body">
+            <p class="stat-label">Taxa de Conclusão</p>
+            <h3 class="stat-value">{{ taxa_conclusao }}%</h3>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="chart-section">
+        <div class="chart-header">
+            <h2>Desempenho por Membro — {{ equipe_selecionada.nome }}</h2>
+        </div>
+        {% for membro in analise_membros %}
+        <div class="membro-card">
+            <div class="membro-topo">
+                <div>
+                    <p class="membro-nome">
+                        {{ membro.nome }}
+                        {% if membro.eh_lider %}
+                        <span class="stat-badge" style="margin-left: 6px;">👑 Líder</span>
+                        {% endif %}
+                    </p>
+                    <span class="membro-email">{{ membro.email }}</span>
+                </div>
+                <span class="stat-badge completed">{{ membro.percentual }}%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" style="width: {{ membro.percentual }}%;"></div>
+            </div>
+            <p class="text-muted" style="font-size: 12px; margin: 8px 0 0 0;">
+                {{ membro.concluidas }} concluída(s) de {{ membro.total }} tarefa(s) • {{ membro.pendentes }}
+                pendente(s)
+            </p>
+        </div>
+        {% empty %}
+        <p class="text-muted">Nenhum membro nesta equipe.</p>
+        {% endfor %}
+    </div>
+
+    <div class="sidebar-section">
+        <div class="tasks-section">
+            <div class="section-header">
+                <h3>Tarefas por Prioridade</h3>
+            </div>
+            <div class="prioridade-row">
+                <span class="prioridade-dot" style="background: #ef4444;"></span>
+                <span style="flex: 1;">Alta</span>
+                <strong>{{ prioridades.high }}</strong>
+            </div>
+            <div class="prioridade-row">
+                <span class="prioridade-dot" style="background: #f59e0b;"></span>
+                <span style="flex: 1;">Média</span>
+                <strong>{{ prioridades.medium }}</strong>
+            </div>
+            <div class="prioridade-row">
+                <span class="prioridade-dot" style="background: #10b981;"></span>
+                <span style="flex: 1;">Baixa</span>
+                <strong>{{ prioridades.low }}</strong>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-lock"></i>
+    <h2>Acesso restrito a líderes</h2>
+    <p>Você não lidera nenhuma equipe. Apenas o líder/gerente de um grupo pode visualizar a análise de tarefas.</p>
+</div>
+{% endif %}
+{% endblock %}
