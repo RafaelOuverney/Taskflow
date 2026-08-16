@@ -199,7 +199,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         minhas_equipes = Equipe.objects.filter(membros=user).order_by("-updated_at")[:3]
 
         hoje = timezone.now().date()
-        dias_semana = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"]
+        dias_semana = [ "SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"]
         tarefas_por_dia = []
 
         max_value = 1
@@ -214,7 +214,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         for i, count in enumerate(dados_brutos):
             dia_atual = hoje - timedelta(days=6 - i)
             nome_dia = dias_semana[dia_atual.weekday()]
-            percentual = int((count / max_value) * 10) if max_value > 0 else 0
+            percentual = int((count / max_value) * 200) if max_value > 0 else 0
             altura_final = max(percentual, 5)
             tarefas_por_dia.append(
                 {"nome": nome_dia, "count": count, "percentual": altura_final}

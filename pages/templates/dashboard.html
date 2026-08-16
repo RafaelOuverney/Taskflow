@@ -66,8 +66,7 @@
             <div class="chart">
                 {% for dia in tarefas_por_dia %}
                     <div class="bar-wrapper">
-                        <div class="bar {% if forloop.last %}active{% endif %}" style="height: {{ dia.percentual }}%;"
-                            data-day="{{ dia.nome }}" title="{{ dia.count }} tarefas concluídas">
+                        <div class="bar {% if forloop.last %}active{% endif %}" style="height: {{ dia.percentual }}px;" data-day="{{ dia.nome }}" title="{{ dia.count }} tarefas concluídas">
                         </div>
                         <span>{{ dia.nome }}</span>
                     </div>
