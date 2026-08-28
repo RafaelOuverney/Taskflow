@@ -771,12 +771,12 @@ class EquipeDeleteView(LoginRequiredMixin, DeleteView):
         return Equipe.objects.filter(owner=self.request.user)
 
 
-class AnaliseView(LoginRequiredMixin, TemplateView):
+class AnaliseView(LoginRequiredMixin, GroupRequiredMixin, TemplateView):
     """
     Página de Análise: apresenta a análise do grupo quanto às tarefas.
     Restrita aos líderes (owners) das equipes.
     """
-
+    group_required = ['Admins']
     template_name = "analise.html"
     login_url = "index"
 

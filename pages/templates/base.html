@@ -16,6 +16,27 @@
 </head>
 
 <body>
+    {% if messages %}
+    <div
+        style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;">
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
+            role="alert"
+            style="min-width: 300px; box-shadow: 0 8px 16px rgba(0,0,0,0.15); border-radius: 8px; display: flex; align-items: center; background-color: white; border-left: 4px solid {% if message.tags == 'error' %}#ef4444{% else %}#10b981{% endif %};">
+
+            {% if message.tags == 'success' %}
+            <i class="fas fa-check-circle me-2" style="color: #10b981; font-size: 20px;"></i>
+            {% else %}
+            <i class="fas fa-exclamation-circle me-2" style="color: #ef4444; font-size: 20px;"></i>
+            {% endif %}
+
+            <span style="color: #1e293b; font-weight: 500;">{{ message }}</span>
+
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% if user.is_authenticated %}
     <aside class="sidebar">
         <div class="sidebar-header">
@@ -65,7 +86,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'analise' %}"class="nav-link {% if request.resolver_match.url_name == 'analise' %}active{% endif %}">
+                    <a href="{% url 'analise' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'analise' %}active{% endif %}">
                         <i class="fas fa-chart-bar"></i>
                         <span>Análise</span>
                     </a>
