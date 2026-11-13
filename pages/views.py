@@ -1,6 +1,5 @@
 import json
 from datetime import timedelta
-from enum import member
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
@@ -23,6 +22,7 @@ from django.views.generic import (
     UpdateView,
 )
 
+from pages.filters import EquipeFilter, TaskFilter
 from pages.forms import EquipeForm, ProfileUpdateForm, SecurityForm, UserUpdateForm
 from pages.mixins import GroupRequiredMixin
 from pages.models import Equipe, Notebook, Task
@@ -53,6 +53,7 @@ class IndexView(TemplateView):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user)
+            
                 if remember_me:
                     request.session.set_expiry(1209600)
                     request.session["remember_me"] = True
@@ -158,6 +159,7 @@ class CadastroView(TemplateView):
             )
 
             login(request, user)
+            
 
             return JsonResponse(
                 {
@@ -376,11 +378,15 @@ class TasksListView(LoginRequiredMixin, ListView):
     login_url = "index"
 
     def get_queryset(self):
-        return Task.objects.filter(owner=self.request.user)
+        qs = Task.objects.filter(owner=self.request.user).prefetch_related("subtasks")
+        self.filterset = TaskFilter(self.request.GET, queryset=qs)
+        return self.filterset.qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_name"] = self.request.user.first_name or self.request.user.email
+        context["filter"] = self.filterset
+        context["filterset"] = self.filterset
         return context
 
 
@@ -721,11 +727,25 @@ class EquipeListView(LoginRequiredMixin, ListView):
     model = Equipe
     template_name = "equipes/equipe-lista.html"
     context_object_name = "equipes"
+    paginate_by = 6
 
     def get_queryset(self):
-        return Equipe.objects.filter(
-            Q(owner=self.request.user) | Q(membros=self.request.user)
-        ).distinct()
+        qs = (
+            Equipe.objects.filter(
+                Q(owner=self.request.user) | Q(membros=self.request.user)
+            )
+            .select_related("owner")
+            .prefetch_related("membros")
+            .distinct()
+        )
+        self.filterset = EquipeFilter(self.request.GET, queryset=qs)
+        return self.filterset.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["filter"] = self.filterset
+        context["filterset"] = self.filterset
+        return context
 
 
 class EquipeDetailView(LoginRequiredMixin, DetailView):
@@ -749,6 +769,7 @@ class EquipeCreateView(LoginRequiredMixin, CreateView):
         form.instance.owner = self.request.user
         self.object = form.save()
         self.object.membros.add(self.request.user)
+        messages.success(self.request, f"Equipe '{self.object.nome}' criada com sucesso!")
         return super().form_valid(form)
 
 
@@ -761,6 +782,10 @@ class EquipeUpdateView(LoginRequiredMixin, UpdateView):
     def get_queryset(self):
         return Equipe.objects.filter(owner=self.request.user)
 
+    def form_valid(self, form):
+        messages.success(self.request, f"Equipe '{form.instance.nome}' atualizada com sucesso!")
+        return super().form_valid(form)
+
 
 class EquipeDeleteView(LoginRequiredMixin, DeleteView):
     model = Equipe
@@ -769,6 +794,10 @@ class EquipeDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Equipe.objects.filter(owner=self.request.user)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Equipe excluída com sucesso!")
+        return super().form_valid(form)
 
 
 class AnaliseView(LoginRequiredMixin, GroupRequiredMixin, TemplateView):

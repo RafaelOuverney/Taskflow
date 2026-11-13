@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load query_params %}
 
 {% block title %}Tarefas - TaskFlow{% endblock %}
 
@@ -71,17 +72,38 @@
             <input type="text" class="tasks-search" id="tasksSearch" placeholder="Buscar tarefas...">
         </div>
 
+                <!-- Filtro Django-Filter -->
+        <form method="get" class="django-filter-form" style="display: flex; gap: 8px; margin: 15px 0; align-items: center; flex-wrap: wrap; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="flex: 2; min-width: 180px;">
+                {{ filter.form.title }}
+            </div>
+            <div style="flex: 1; min-width: 140px;">
+                {{ filter.form.priority }}
+            </div>
+            <div style="flex: 1; min-width: 140px;">
+                {{ filter.form.completed }}
+            </div>
+            <button type="submit" class="btn" style="background: #2563eb; color: white; border: none; border-radius: 6px; padding: 6px 14px; font-weight: 500;">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+            {% if request.GET.title or request.GET.priority or request.GET.completed %}
+            <a href="{% url 'tarefas' %}" class="btn" style="background: #64748b; color: white; border-radius: 6px; padding: 6px 14px; text-decoration: none;">
+                Limpar
+            </a>
+            {% endif %}
+        </form>
+
         <div class="tasks-list" id="tasksList">
         </div>
         <div class="paginacao">
             {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="btn-pag">Anterior</a>
+            <a href="?{% param_replace page=page_obj.previous_page_number %}" class="btn-pag">Anterior</a>
             {% endif %}
 
             <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
 
             {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="btn-pag">Próxima</a>
+            <a href="?{% param_replace page=page_obj.next_page_number %}" class="btn-pag">Próxima</a>
             {% endif %}
         </div>
 
