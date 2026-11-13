@@ -1,0 +1,454 @@
+{
+  "metadata": {
+    "executed_at": "12/11/2026 20:17:32",
+    "mode": "standalone",
+    "target_url": "http://127.0.0.1:50777",
+    "database_engine": "sqlite3 (temporário)",
+    "debug_toolbar_enabled": true,
+    "users": 30,
+    "duration_seconds": 30,
+    "ramp_up_seconds": 5.0,
+    "think_time_range": "0.1-0.35s"
+  },
+  "global": {
+    "total_requests": 811,
+    "successes": 807,
+    "failures": 4,
+    "error_rate_pct": 0.49,
+    "duration_seconds": 30.94,
+    "rps": 26.21,
+    "total_bytes": 21603730,
+    "total_kb": 21097.39,
+    "throughput_kbps": 681.82,
+    "min_ms": 14.3,
+    "avg_ms": 820.44,
+    "p50_ms": 427.21,
+    "p90_ms": 1806.73,
+    "p95_ms": 3194.35,
+    "p99_ms": 5941.19,
+    "max_ms": 7784.25,
+    "stddev_ms": 1167.83
+  },
+  "endpoints": [
+    {
+      "method": "POST",
+      "endpoint": "/api/notebook/save/",
+      "requests": 143,
+      "failures": 0,
+      "error_rate_pct": 0.0,
+      "rps": 4.62,
+      "bytes_received": 13156,
+      "min_ms": 20.89,
+      "avg_ms": 630.27,
+      "p50_ms": 330.99,
+      "p90_ms": 1672.88,
+      "p95_ms": 2876.4,
+      "p99_ms": 4382.53,
+      "max_ms": 5117.29,
+      "stddev_ms": 903.13
+    },
+    {
+      "method": "GET",
+      "endpoint": "/dashboard/",
+      "requests": 124,
+      "failures": 2,
+      "error_rate_pct": 1.61,
+      "rps": 4.01,
+      "bytes_received": 6039618,
+      "min_ms": 44.77,
+      "avg_ms": 1549.63,
+      "p50_ms": 1085.8,
+      "p90_ms": 2895.63,
+      "p95_ms": 4911.34,
+      "p99_ms": 7503.48,
+      "max_ms": 7784.25,
+      "stddev_ms": 1416.01
+    },
+    {
+      "method": "GET",
+      "endpoint": "/api/task/list/",
+      "requests": 92,
+      "failures": 1,
+      "error_rate_pct": 1.09,
+      "rps": 2.97,
+      "bytes_received": 307032,
+      "min_ms": 22.56,
+      "avg_ms": 1046.21,
+      "p50_ms": 647.95,
+      "p90_ms": 1849.26,
+      "p95_ms": 4397.54,
+      "p99_ms": 7044.69,
+      "max_ms": 7073.97,
+      "stddev_ms": 1357.04
+    },
+    {
+      "method": "GET",
+      "endpoint": "/tarefas/",
+      "requests": 76,
+      "failures": 0,
+      "error_rate_pct": 0.0,
+      "rps": 2.46,
+      "bytes_received": 3497204,
+      "min_ms": 25.72,
+      "avg_ms": 545.91,
+      "p50_ms": 344.23,
+      "p90_ms": 754.7,
+      "p95_ms": 1332.61,
+      "p99_ms": 5083.42,
+      "max_ms": 5660.85,
+      "stddev_ms": 899.84
+    },
+    {
+      "method": "GET",
+      "endpoint": "/caderno/",
+      "requests": 64,
+      "failures": 0,
+      "error_rate_pct": 0.0,
+      "rps": 2.07,
+      "bytes_received": 2871296,
+      "min_ms": 22.52,
+      "avg_ms": 734.22,
+      "p50_ms": 386.48,
+      "p90_ms": 1529.4,
+      "p95_ms": 2683.7,
+      "p99_ms": 6103.1,
+      "max_ms": 6372.92,
+      "stddev_ms": 1185.7
+    },
+    {
+      "method": "GET",
+      "endpoint": "/tarefas/?priority=high&completed=false",
+      "requests": 63,
+      "failures": 0,
+      "error_rate_pct": 0.0,
+      "rps": 2.04,
+      "bytes_received": 2913719,
+      "min_ms": 30.95,
+      "avg_ms": 611.71,
+      "p50_ms": 308.13,
+      "p90_ms": 1346.97,
+      "p95_ms": 2442.64,
+      "p99_ms": 4266.92,
+      "max_ms": 5502.84,
+      "stddev_ms": 901.87
+    },
+    {
+      "method": "POST",
+      "endpoint": "/api/task/toggle/",
+      "requests": 51,
+      "failures": 1,
+      "error_rate_pct": 1.96,
+      "rps": 1.65,
+      "bytes_received": 4148,
+      "min_ms": 21.09,
+      "avg_ms": 848.94,
+      "p50_ms": 332.14,
+      "p90_ms": 2672.73,
+      "p95_ms": 4552.54,
+      "p99_ms": 6004.98,
+      "max_ms": 6980.68,
+      "stddev_ms": 1433.96
+    },
+    {
+      "method": "GET",
+      "endpoint": "/equipes/",
+      "requests": 39,
+      "failures": 0,
+      "error_rate_pct": 0.0,
+      "rps": 1.26,
+      "bytes_received": 1856754,
+      "min_ms": 42.7,
+      "avg_ms": 966.1,
+      "p50_ms": 490.1,
+      "p90_ms": 2657.84,
+      "p95_ms": 4405.15,
+      "p99_ms": 5268.35,
+      "max_ms": 5746.65,
+      "stddev_ms": 1292.94
+    },
+    {
+      "method": "GET",
+      "endpoint": "/",
+      "requests": 30,
+      "failures": 0,
+      "error_rate_pct": 0.0,
+      "rps": 0.97,
+      "bytes_received": 1043903,
+      "min_ms": 14.3,
+      "avg_ms": 31.84,
+      "p50_ms": 28.24,
+      "p90_ms": 47.51,
+      "p95_ms": 56.2,
+      "p99_ms": 76.86,
+      "max_ms": 83.58,
+      "stddev_ms": 14.56
+    },
+    {
+      "method": "POST",
+      "endpoint": "/",
+      "requests": 30,
+      "failures": 0,
+      "error_rate_pct": 0.0,
+      "rps": 0.97,
+      "bytes_received": 3150,
+      "min_ms": 57.14,
+      "avg_ms": 321.36,
+      "p50_ms": 200.91,
+      "p90_ms": 439.07,
+      "p95_ms": 976.6,
+      "p99_ms": 2223.88,
+      "max_ms": 2608.84,
+      "stddev_ms": 487.19
+    },
+    {
+      "method": "POST",
+      "endpoint": "/api/task/create/",
+      "requests": 30,
+      "failures": 0,
+      "error_rate_pct": 0.0,
+      "rps": 0.97,
+      "bytes_received": 6397,
+      "min_ms": 33.98,
+      "avg_ms": 289.96,
+      "p50_ms": 232.17,
+      "p90_ms": 530.66,
+      "p95_ms": 587.34,
+      "p99_ms": 1087.73,
+      "max_ms": 1283.02,
+      "stddev_ms": 248.93
+    },
+    {
+      "method": "GET",
+      "endpoint": "/equipes/<id>/",
+      "requests": 26,
+      "failures": 0,
+      "error_rate_pct": 0.0,
+      "rps": 0.84,
+      "bytes_received": 1136482,
+      "min_ms": 48.27,
+      "avg_ms": 935.33,
+      "p50_ms": 605.15,
+      "p90_ms": 1618.78,
+      "p95_ms": 1968.39,
+      "p99_ms": 4754.63,
+      "max_ms": 5647.18,
+      "stddev_ms": 1067.48
+    },
+    {
+      "method": "GET",
+      "endpoint": "/ia/meu-consumo/",
+      "requests": 23,
+      "failures": 0,
+      "error_rate_pct": 0.0,
+      "rps": 0.74,
+      "bytes_received": 975102,
+      "min_ms": 60.16,
+      "avg_ms": 746.81,
+      "p50_ms": 348.51,
+      "p90_ms": 1435.94,
+      "p95_ms": 2345.74,
+      "p99_ms": 5146.93,
+      "max_ms": 5910.18,
+      "stddev_ms": 1220.33
+    },
+    {
+      "method": "GET",
+      "endpoint": "/analise/?equipe=<id>",
+      "requests": 20,
+      "failures": 0,
+      "error_rate_pct": 0.0,
+      "rps": 0.65,
+      "bytes_received": 935769,
+      "min_ms": 61.94,
+      "avg_ms": 903.15,
+      "p50_ms": 830.91,
+      "p90_ms": 1302.8,
+      "p95_ms": 1785.87,
+      "p99_ms": 2230.13,
+      "max_ms": 2341.2,
+      "stddev_ms": 494.91
+    }
+  ],
+  "status_codes": {
+    "200": 807,
+    "400": 3,
+    "500": 1
+  },
+  "top_errors": [
+    {
+      "message": "HTTP 400 em GET /dashboard/",
+      "count": 2
+    },
+    {
+      "message": "HTTP 500 em POST /api/task/toggle/",
+      "count": 1
+    },
+    {
+      "message": "HTTP 400 em GET /api/task/list/",
+      "count": 1
+    }
+  ],
+  "time_series": [
+    {
+      "bucket": 1,
+      "label": "0-2s",
+      "requests": 59,
+      "failures": 0,
+      "rps": 29.5,
+      "avg_ms": 55.91,
+      "p95_ms": 113.26
+    },
+    {
+      "bucket": 2,
+      "label": "2-4s",
+      "requests": 67,
+      "failures": 0,
+      "rps": 33.5,
+      "avg_ms": 309.18,
+      "p95_ms": 779.64
+    },
+    {
+      "bucket": 3,
+      "label": "4-6s",
+      "requests": 58,
+      "failures": 0,
+      "rps": 29.0,
+      "avg_ms": 545.1,
+      "p95_ms": 1667.18
+    },
+    {
+      "bucket": 4,
+      "label": "6-8s",
+      "requests": 49,
+      "failures": 0,
+      "rps": 24.5,
+      "avg_ms": 835.68,
+      "p95_ms": 2144.96
+    },
+    {
+      "bucket": 5,
+      "label": "8-10s",
+      "requests": 52,
+      "failures": 0,
+      "rps": 26.0,
+      "avg_ms": 676.92,
+      "p95_ms": 2074.19
+    },
+    {
+      "bucket": 6,
+      "label": "10-12s",
+      "requests": 54,
+      "failures": 2,
+      "rps": 27.0,
+      "avg_ms": 1061.86,
+      "p95_ms": 4491.1
+    },
+    {
+      "bucket": 7,
+      "label": "12-14s",
+      "requests": 51,
+      "failures": 0,
+      "rps": 25.5,
+      "avg_ms": 988.62,
+      "p95_ms": 3853.3
+    },
+    {
+      "bucket": 8,
+      "label": "14-16s",
+      "requests": 53,
+      "failures": 0,
+      "rps": 26.5,
+      "avg_ms": 744.39,
+      "p95_ms": 2725.89
+    },
+    {
+      "bucket": 9,
+      "label": "16-18s",
+      "requests": 50,
+      "failures": 0,
+      "rps": 25.0,
+      "avg_ms": 904.36,
+      "p95_ms": 3841.38
+    },
+    {
+      "bucket": 10,
+      "label": "18-20s",
+      "requests": 59,
+      "failures": 0,
+      "rps": 29.5,
+      "avg_ms": 828.56,
+      "p95_ms": 2805.84
+    },
+    {
+      "bucket": 11,
+      "label": "20-22s",
+      "requests": 47,
+      "failures": 1,
+      "rps": 23.5,
+      "avg_ms": 1202.64,
+      "p95_ms": 5457.55
+    },
+    {
+      "bucket": 12,
+      "label": "22-24s",
+      "requests": 43,
+      "failures": 0,
+      "rps": 21.5,
+      "avg_ms": 972.13,
+      "p95_ms": 2704.48
+    },
+    {
+      "bucket": 13,
+      "label": "24-26s",
+      "requests": 51,
+      "failures": 0,
+      "rps": 25.5,
+      "avg_ms": 1035.63,
+      "p95_ms": 3470.92
+    },
+    {
+      "bucket": 14,
+      "label": "26-28s",
+      "requests": 51,
+      "failures": 1,
+      "rps": 25.5,
+      "avg_ms": 874.39,
+      "p95_ms": 3720.2
+    },
+    {
+      "bucket": 15,
+      "label": "28-30.9s",
+      "requests": 67,
+      "failures": 0,
+      "rps": 22.77,
+      "avg_ms": 1441.03,
+      "p95_ms": 5056.97
+    }
+  ],
+  "sla": {
+    "passed": false,
+    "checks": [
+      {
+        "criterion": "Taxa de erro global <= 2.00%",
+        "measured": "0.49%",
+        "passed": true
+      },
+      {
+        "criterion": "Latência p95 global <= 1000 ms",
+        "measured": "3194.35 ms",
+        "passed": false
+      },
+      {
+        "criterion": "Latência p99 global <= 2000 ms",
+        "measured": "5941.19 ms",
+        "passed": false
+      }
+    ]
+  },
+  "diagnostics": [
+    "Taxa de erro global de 0.49% (4 falhas em 811 requisições).",
+    "Endpoint com maior latência p95: `GET /dashboard/` (p95 = 4911.34 ms, média = 1549.63 ms).",
+    "Endpoint mais demandado: `POST /api/notebook/save/` com 143 requisições (4.62 req/s).",
+    "Django Debug Toolbar ativo durante o benchmark (DEBUG=True), adicionando overhead de instrumentação às respostas HTML. Em produção (DEBUG=False), a latência tende a ser menor."
+  ]
+}

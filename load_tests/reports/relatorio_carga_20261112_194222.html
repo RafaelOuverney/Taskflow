@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relatório de Teste de Carga — TaskFlow</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --pass: #15803d;
+      --pass-bg: #dcfce7;
+      --fail: #b91c1c;
+      --fail-bg: #fee2e2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 28px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container { max-width: 1180px; margin: 0 auto; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    h1 { margin: 0 0 6px; font-size: 1.75rem; }
+    h2 { margin: 0 0 14px; font-size: 1.15rem; color: var(--text); }
+    .meta { color: var(--muted); font-size: 0.92rem; }
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .badge-pass { background: var(--pass-bg); color: var(--pass); }
+    .badge-fail { background: var(--fail-bg); color: var(--fail); }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .kpi {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .kpi-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    .kpi-value { font-size: 1.5rem; font-weight: 700; margin-top: 4px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 18px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { padding: 9px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    th { background: #f1f5f9; font-weight: 600; color: #334155; }
+    .text-danger { color: var(--fail); font-weight: 600; }
+    .text-ok { color: var(--pass); }
+    .chart-svg { width: 100%; height: auto; display: block; }
+    .legend { font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; }
+    code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Relatório de Teste de Carga — TaskFlow</h1>
+        <div class="meta">
+          Executado em <strong>12/11/2026 19:42:22</strong> |
+          Modo: <code>standalone</code> |
+          Alvo: <code>http://127.0.0.1:58831</code> |
+          Banco: <code>sqlite3 (temporário)</code> |
+          VUs: <strong>15</strong> |
+          Duração: <strong>12s</strong>
+        </div>
+      </div>
+      <span class="badge badge-pass">SLA APROVADO</span>
+    </header>
+
+    <section class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Total Requisições</div><div class="kpi-value">436</div></div>
+      <div class="kpi"><div class="kpi-label">Vazão Média (RPS)</div><div class="kpi-value">36.07/s</div></div>
+      <div class="kpi"><div class="kpi-label">Taxa de Erros</div><div class="kpi-value">0.00%</div></div>
+      <div class="kpi"><div class="kpi-label">Latência Média</div><div class="kpi-value">168.5 ms</div></div>
+      <div class="kpi"><div class="kpi-label">Percentil p95</div><div class="kpi-value">401.4 ms</div></div>
+      <div class="kpi"><div class="kpi-label">Percentil p99</div><div class="kpi-value">551.4 ms</div></div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>Critérios de SLA</h2>
+        <table>
+          <thead><tr><th>Critério</th><th>Medido</th><th>Status</th></tr></thead>
+          <tbody><tr><td>Taxa de erro global &lt;= 2.00%</td><td><strong>0.00%</strong></td><td><span class='badge badge-pass'>Aprovado</span></td></tr><tr><td>Latência p95 global &lt;= 1000 ms</td><td><strong>401.45 ms</strong></td><td><span class='badge badge-pass'>Aprovado</span></td></tr><tr><td>Latência p99 global &lt;= 2000 ms</td><td><strong>551.35 ms</strong></td><td><span class='badge badge-pass'>Aprovado</span></td></tr></tbody>
+        </table>
+      </section>
+      <section class="card">
+        <h2>Códigos HTTP</h2>
+        <table>
+          <thead><tr><th>Código</th><th>Quantidade</th><th>%</th></tr></thead>
+          <tbody><tr><td><code>200</code></td><td>436</td><td>100.00%</td></tr></tbody>
+        </table>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Evolução Temporal (RPS vs. Latência p95)</h2>
+      <div class="legend">Linha azul sólida: RPS | Linha laranja tracejada: p95 (ms)</div>
+      <svg viewBox="0 0 760 240" class="chart-svg" role="img" aria-label="Evolução temporal de RPS e Latência p95">
+<line x1="54" y1="24" x2="54" y2="198" stroke="#cbd5e1" />
+<line x1="54" y1="198" x2="706" y2="198" stroke="#cbd5e1" />
+<line x1="706" y1="24" x2="706" y2="198" stroke="#cbd5e1" />
+<text x="48" y="32" text-anchor="end" font-size="10" fill="#2563eb">40.0 RPS</text>
+<text x="712" y="32" text-anchor="start" font-size="10" fill="#f59e0b">481 ms</text>
+<polyline fill="none" stroke="#2563eb" stroke-width="2.5" points="54.0,54.5 184.4,43.6 314.8,37.0 445.2,47.9 575.6,24.0 706.0,39.7" />
+<polyline fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="5,3" points="54.0,120.3 184.4,24.0 314.8,59.5 445.2,27.8 575.6,65.4 706.0,53.5" />
+<circle cx="54.0" cy="54.5" r="3.5" fill="#2563eb" />
+<circle cx="184.4" cy="43.6" r="3.5" fill="#2563eb" />
+<circle cx="314.8" cy="37.0" r="3.5" fill="#2563eb" />
+<circle cx="445.2" cy="47.9" r="3.5" fill="#2563eb" />
+<circle cx="575.6" cy="24.0" r="3.5" fill="#2563eb" />
+<circle cx="706.0" cy="39.7" r="3.5" fill="#2563eb" />
+<circle cx="54.0" cy="120.3" r="3.5" fill="#f59e0b" />
+<circle cx="184.4" cy="24.0" r="3.5" fill="#f59e0b" />
+<circle cx="314.8" cy="59.5" r="3.5" fill="#f59e0b" />
+<circle cx="445.2" cy="27.8" r="3.5" fill="#f59e0b" />
+<circle cx="575.6" cy="65.4" r="3.5" fill="#f59e0b" />
+<circle cx="706.0" cy="53.5" r="3.5" fill="#f59e0b" />
+<text x="54.0" y="228" text-anchor="middle" font-size="10" fill="#64748b">0-2s</text>
+<text x="184.4" y="228" text-anchor="middle" font-size="10" fill="#64748b">2-4s</text>
+<text x="314.8" y="228" text-anchor="middle" font-size="10" fill="#64748b">4-6s</text>
+<text x="445.2" y="228" text-anchor="middle" font-size="10" fill="#64748b">6-8s</text>
+<text x="575.6" y="228" text-anchor="middle" font-size="10" fill="#64748b">8-10s</text>
+<text x="706.0" y="228" text-anchor="middle" font-size="10" fill="#64748b">10-12.1s</text>
+</svg>
+    </section>
+
+    <section class="card">
+      <h2>Latência por Endpoint (Média vs. p95)</h2>
+      <svg viewBox="0 0 810 444" class="chart-svg" role="img" aria-label="Latência p95 por endpoint">
+<text x="260" y="18" font-size="11" fill="#64748b">Latência p95 e Média (ms)</text>
+<text x="8" y="46" font-size="12" fill="#1e293b" font-family="monospace">GET /dashboard/</text>
+<rect x="260" y="33" width="420.0" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="33" width="251.4" height="18" rx="4" fill="#2563eb" />
+<text x="688.0" y="46" font-size="11" fill="#334155">avg 327ms | p95 547ms</text>
+<text x="8" y="80" font-size="12" fill="#1e293b" font-family="monospace">POST /api/notebook/save/</text>
+<rect x="260" y="67" width="216.7" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="67" width="106.2" height="18" rx="4" fill="#2563eb" />
+<text x="484.7" y="80" font-size="11" fill="#334155">avg 138ms | p95 282ms</text>
+<text x="8" y="114" font-size="12" fill="#1e293b" font-family="monospace">GET /tarefas/</text>
+<rect x="260" y="101" width="160.1" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="101" width="89.8" height="18" rx="4" fill="#2563eb" />
+<text x="428.1" y="114" font-size="11" fill="#334155">avg 117ms | p95 208ms</text>
+<text x="8" y="148" font-size="12" fill="#1e293b" font-family="monospace">GET /api/task/list/</text>
+<rect x="260" y="135" width="237.3" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="135" width="108.8" height="18" rx="4" fill="#2563eb" />
+<text x="505.3" y="148" font-size="11" fill="#334155">avg 142ms | p95 309ms</text>
+<text x="8" y="182" font-size="12" fill="#1e293b" font-family="monospace">GET /caderno/</text>
+<rect x="260" y="169" width="200.0" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="169" width="108.8" height="18" rx="4" fill="#2563eb" />
+<text x="468.0" y="182" font-size="11" fill="#334155">avg 142ms | p95 260ms</text>
+<text x="8" y="216" font-size="12" fill="#1e293b" font-family="monospace">POST /api/task/toggle/</text>
+<rect x="260" y="203" width="215.0" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="203" width="111.8" height="18" rx="4" fill="#2563eb" />
+<text x="483.0" y="216" font-size="11" fill="#334155">avg 146ms | p95 280ms</text>
+<text x="8" y="250" font-size="12" fill="#1e293b" font-family="monospace">GET /tarefas/?priority=high&amp...</text>
+<rect x="260" y="237" width="169.6" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="237" width="91.5" height="18" rx="4" fill="#2563eb" />
+<text x="437.6" y="250" font-size="11" fill="#334155">avg 119ms | p95 221ms</text>
+<text x="8" y="284" font-size="12" fill="#1e293b" font-family="monospace">GET /equipes/</text>
+<rect x="260" y="271" width="209.5" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="271" width="149.7" height="18" rx="4" fill="#2563eb" />
+<text x="477.5" y="284" font-size="11" fill="#334155">avg 195ms | p95 273ms</text>
+<text x="8" y="318" font-size="12" fill="#1e293b" font-family="monospace">POST /api/task/create/</text>
+<rect x="260" y="305" width="209.4" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="305" width="81.4" height="18" rx="4" fill="#2563eb" />
+<text x="477.4" y="318" font-size="11" fill="#334155">avg 106ms | p95 273ms</text>
+<text x="8" y="352" font-size="12" fill="#1e293b" font-family="monospace">GET /</text>
+<rect x="260" y="339" width="44.8" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="339" width="24.7" height="18" rx="4" fill="#2563eb" />
+<text x="312.8" y="352" font-size="11" fill="#334155">avg 32ms | p95 58ms</text>
+<text x="8" y="386" font-size="12" fill="#1e293b" font-family="monospace">POST /</text>
+<rect x="260" y="373" width="164.3" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="373" width="87.4" height="18" rx="4" fill="#2563eb" />
+<text x="432.3" y="386" font-size="11" fill="#334155">avg 114ms | p95 214ms</text>
+<text x="8" y="420" font-size="12" fill="#1e293b" font-family="monospace">GET /equipes/&lt;id&gt;/</text>
+<rect x="260" y="407" width="258.0" height="18" rx="4" fill="#2563eb" opacity="0.28" />
+<rect x="260" y="407" width="122.0" height="18" rx="4" fill="#2563eb" />
+<text x="526.0" y="420" font-size="11" fill="#334155">avg 159ms | p95 336ms</text>
+</svg>
+    </section>
+
+    <section class="card">
+      <h2>Detalhamento por Endpoint</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Método</th><th>Endpoint</th><th>Req.</th><th>Falhas</th><th>RPS</th>
+            <th>Mín</th><th>Média</th><th>p50</th><th>p95</th><th>p99</th><th>Máx</th>
+          </tr>
+        </thead>
+        <tbody><tr><td><code>GET</code></td><td><code>/dashboard/</code></td><td>72</td><td class='text-ok'>0 (0.00%)</td><td>5.96</td><td>78.92</td><td>327.33</td><td>323.00</td><td><strong>546.85</strong></td><td>698.78</td><td>724.41</td></tr><tr><td><code>POST</code></td><td><code>/api/notebook/save/</code></td><td>70</td><td class='text-ok'>0 (0.00%)</td><td>5.79</td><td>24.66</td><td>138.26</td><td>115.74</td><td><strong>282.09</strong></td><td>356.61</td><td>390.09</td></tr><tr><td><code>GET</code></td><td><code>/tarefas/</code></td><td>48</td><td class='text-ok'>0 (0.00%)</td><td>3.97</td><td>45.34</td><td>116.93</td><td>115.98</td><td><strong>208.49</strong></td><td>242.54</td><td>262.57</td></tr><tr><td><code>GET</code></td><td><code>/api/task/list/</code></td><td>42</td><td class='text-ok'>0 (0.00%)</td><td>3.47</td><td>20.61</td><td>141.61</td><td>130.31</td><td><strong>309.00</strong></td><td>373.21</td><td>378.49</td></tr><tr><td><code>GET</code></td><td><code>/caderno/</code></td><td>35</td><td class='text-ok'>0 (0.00%)</td><td>2.90</td><td>23.30</td><td>141.60</td><td>140.13</td><td><strong>260.38</strong></td><td>276.66</td><td>284.01</td></tr><tr><td><code>POST</code></td><td><code>/api/task/toggle/</code></td><td>30</td><td class='text-ok'>0 (0.00%)</td><td>2.48</td><td>23.27</td><td>145.59</td><td>124.41</td><td><strong>279.91</strong></td><td>593.07</td><td>718.61</td></tr><tr><td><code>GET</code></td><td><code>/tarefas/?priority=high&amp;completed=false</code></td><td>29</td><td class='text-ok'>0 (0.00%)</td><td>2.40</td><td>51.02</td><td>119.08</td><td>106.06</td><td><strong>220.86</strong></td><td>267.91</td><td>284.19</td></tr><tr><td><code>GET</code></td><td><code>/equipes/</code></td><td>22</td><td class='text-ok'>0 (0.00%)</td><td>1.82</td><td>35.85</td><td>194.86</td><td>193.09</td><td><strong>272.77</strong></td><td>313.18</td><td>323.74</td></tr><tr><td><code>POST</code></td><td><code>/api/task/create/</code></td><td>21</td><td class='text-ok'>0 (0.00%)</td><td>1.74</td><td>26.64</td><td>105.99</td><td>78.08</td><td><strong>272.66</strong></td><td>290.55</td><td>295.03</td></tr><tr><td><code>GET</code></td><td><code>/</code></td><td>15</td><td class='text-ok'>0 (0.00%)</td><td>1.24</td><td>12.57</td><td>32.20</td><td>28.26</td><td><strong>58.32</strong></td><td>61.81</td><td>62.68</td></tr><tr><td><code>POST</code></td><td><code>/</code></td><td>15</td><td class='text-ok'>0 (0.00%)</td><td>1.24</td><td>62.78</td><td>113.76</td><td>98.49</td><td><strong>213.88</strong></td><td>238.00</td><td>244.03</td></tr><tr><td><code>GET</code></td><td><code>/equipes/&lt;id&gt;/</code></td><td>14</td><td class='text-ok'>0 (0.00%)</td><td>1.16</td><td>54.02</td><td>158.88</td><td>123.72</td><td><strong>335.88</strong></td><td>345.29</td><td>347.65</td></tr><tr><td><code>GET</code></td><td><code>/analise/?equipe=&lt;id&gt;</code></td><td>14</td><td class='text-ok'>0 (0.00%)</td><td>1.16</td><td>148.30</td><td>278.08</td><td>273.57</td><td><strong>419.06</strong></td><td>462.97</td><td>473.95</td></tr><tr><td><code>GET</code></td><td><code>/ia/meu-consumo/</code></td><td>9</td><td class='text-ok'>0 (0.00%)</td><td>0.74</td><td>67.97</td><td>116.31</td><td>127.43</td><td><strong>163.74</strong></td><td>166.98</td><td>167.80</td></tr></tbody>
+      </table>
+    </section>
+
+    
+
+    <section class="card">
+      <h2>Diagnóstico Automático e Recomendações</h2>
+      <ul><li>Nenhuma falha registrada durante todo o ciclo de carga; todas as respostas atenderam aos códigos HTTP e contratos JSON esperados.</li><li>Endpoint com maior latência p95: `GET /dashboard/` (p95 = 546.85 ms, média = 327.33 ms).</li><li>Endpoint mais demandado: `GET /dashboard/` com 72 requisições (5.96 req/s).</li><li>Django Debug Toolbar ativo durante o benchmark (DEBUG=True), adicionando overhead de instrumentação às respostas HTML. Em produção (DEBUG=False), a latência tende a ser menor.</li></ul>
+    </section>
+  </div>
+</body>
+</html>
