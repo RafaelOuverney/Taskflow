@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Load tasks from API
 function loadTasks() {
-    fetch('{% url "task_list_api" %}')
+    fetch('/api/task/list/')
         .then(response => response.json())
         .then(data => {
             tasks = data.tasks || [];
@@ -347,7 +347,7 @@ function saveTask() {
         due_date: new Date(taskDueDate.value).toISOString()
     };
 
-    fetch('{% url "task_create_api" %}', {
+    fetch('/api/task/create/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -374,7 +374,7 @@ function saveTask() {
 function toggleTask(taskId) {
     const csrfToken = getCookie('csrftoken');
 
-    fetch('{% url "task_toggle_api" %}', {
+    fetch('/api/task/toggle/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
