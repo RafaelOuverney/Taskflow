@@ -1,0 +1,83 @@
+%
+% sbc-template.sty
+%
+% Style file for the Sociedade Brasileira de Computação (SBC) template
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sbc-template}[2003/04/09]
+
+\RequirePackage{times}
+
+\newlength{\secspace}
+\setlength{\secspace}{12pt}
+
+\setlength{\paperheight}{297mm}
+\setlength{\paperwidth}{210mm}
+\setlength{\topmargin}{1.0cm}
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0pt}
+\setlength{\textheight}{24.7cm}
+\setlength{\textwidth}{15.0cm}
+\setlength{\marginparsep}{0pt}
+\setlength{\marginparwidth}{0pt}
+\setlength{\oddsidemargin}{0.5cm}
+\setlength{\evensidemargin}{0.5cm}
+
+\setlength{\parindent}{1.27cm}
+\setlength{\parskip}{6pt}
+
+\newcommand{\inst}[1]{$^{#1}$}
+\newcommand{\email}[1]{\texttt{#1}}
+\newcommand{\address}[1]{\gdef\@address{#1}}
+
+\def\maketitle{%
+  \newpage
+  \null
+  \vskip 2em
+  \begin{center}%
+  \let \footnote \thanks
+    {\LARGE \bf \@title \par}%
+    \vskip 1.5em%
+    {\large
+      \lineskip .5em%
+      \begin{tabular}[t]{c}%
+        \@author
+      \end{tabular}\par}%
+    \vskip 1em%
+    {\large \@address \par}%
+  \end{center}%
+  \par
+  \vskip 1.5em}
+
+\renewenvironment{abstract}{%
+      \begin{center}%
+        {\bfseries \abstractname\vspace{-.5em}\vspace{\z@}}%
+      \end{center}%
+      \quotation
+      \setlength{\parindent}{0pt}%
+      \setlength{\parskip}{0pt}%
+      \noindent\ignorespaces}
+      {\endquotation}
+
+\newenvironment{resumo}{%
+      \begin{center}%
+        {\bfseries Resumo\vspace{-.5em}\vspace{\z@}}%
+      \end{center}%
+      \quotation
+      \setlength{\parindent}{0pt}%
+      \setlength{\parskip}{0pt}%
+      \noindent\ignorespaces}
+      {\endquotation}
+
+\def\section{\@startsection {section}{1}{\z@}%
+                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                   {2.3ex \@plus.2ex}%
+                                   {\normalfont\large\bfseries}}
+\def\subsection{\@startsection{subsection}{2}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\def\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
