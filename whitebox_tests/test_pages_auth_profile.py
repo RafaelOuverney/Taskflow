@@ -110,9 +110,34 @@ class PagesAuthAndProfileWhiteBoxTests(TestCase):
         self.assertEqual(resp_logout.url, "/")
 
     def test_perfil_and_alterar_senha_branches(self) -> None:
-        """Cobre PerfilView e os caminhos de erro/sucesso em AlterarSenhaView."""
+        """Cobre PerfilView (GET/POST) e os caminhos de erro/sucesso em AlterarSenhaView."""
         self.client.force_login(self.user)
         self.assertEqual(self.client.get("/perfil/").status_code, 200)
+
+        # Atualização inválida de perfil (email inválido)
+        resp_prof_err = self.client.post(
+            "/perfil/",
+            {"first_name": "Alice", "last_name": "Silva", "email": "email-invalido", "language": "pt-br"},
+        )
+        self.assertEqual(resp_prof_err.status_code, 200)
+
+        # Atualização válida de perfil
+        resp_prof_ok = self.client.post(
+            "/perfil/",
+            {
+                "first_name": "Alice",
+                "last_name": "Souza",
+                "email": "alice.souza@taskflow.com",
+                "phone_number": "(11) 99999-0000",
+                "bio": "Tech Lead",
+                "language": "pt-br",
+                "timezone": "(GMT-03:00) America/Sao_Paulo",
+            },
+        )
+        self.assertEqual(resp_prof_ok.status_code, 302)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.last_name, "Souza")
+        self.assertEqual(self.user.email, "alice.souza@taskflow.com")
 
         # Senha atual incorreta
         r1 = self.client.post(

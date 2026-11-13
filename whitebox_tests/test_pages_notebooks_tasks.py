@@ -230,18 +230,34 @@ class PagesNotebooksTasksWhiteBoxTests(TestCase):
         self.assertEqual(resp.status_code, 403)
 
     def test_tasks_list_view_pagination_and_orm_queries(self) -> None:
-        """Verifica paginação (5 por página) e comportamento das consultas em TasksListView/TasksGetListAPI."""
+        """Verifica paginação (5 por página), filtro preservado e ausência de N+1 em TasksListView/TasksGetListAPI."""
         for i in range(7):
-            t = Task.objects.create(title=f"Bulk {i}", owner=self.alice)
+            t = Task.objects.create(title=f"Bulk {i}", owner=self.alice, priority="low")
             SubTask.objects.create(title=f"Sub {i}", task=t)
 
-        resp = self.client_alice.get("/tarefas/")
+        resp = self.client_alice.get("/tarefas/?priority=low&page=1")
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(len(resp.context["tasks"]), 5)
+        self.assertEqual(len(resp.context["tasks_page_data"]), 5)
+        self.assertContains(resp, "priority=low")
 
-        with CaptureQueriesContext(connection) as ctx:
+        # Sem parâmetros de página, /api/task/list/ retorna todas as tarefas em número constante de queries (sem N+1)
+        with CaptureQueriesContext(connection) as ctx_small:
             resp_api = self.client_alice.get("/api/task/list/")
         self.assertEqual(resp_api.status_code, 200)
         self.assertEqual(len(resp_api.json()["tasks"]), 8)
-        # Documenta quantidade real de queries executadas (inclui sessão + user + tasks + prefetch + count por task)
-        self.assertGreaterEqual(len(ctx), 3)
+
+        for i in range(6):
+            t = Task.objects.create(title=f"Extra {i}", owner=self.alice, priority="medium")
+            SubTask.objects.create(title=f"Sub Extra {i}", task=t)
+
+        with CaptureQueriesContext(connection) as ctx_large:
+            resp_api_large = self.client_alice.get("/api/task/list/")
+        self.assertEqual(resp_api_large.status_code, 200)
+        self.assertEqual(len(resp_api_large.json()["tasks"]), 14)
+        self.assertEqual(len(ctx_large), len(ctx_small))
+
+        # Com filtro e página, /api/task/list/ respeita TaskFilter e Paginator
+        resp_api_paged = self.client_alice.get("/api/task/list/?priority=low&page=2")
+        self.assertEqual(resp_api_paged.status_code, 200)
+        self.assertEqual(len(resp_api_paged.json()["tasks"]), 2)
