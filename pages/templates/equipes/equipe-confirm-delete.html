@@ -1,24 +1,28 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/equipe.css' %}">
-{% endblock %}
+{% block title %}Excluir Equipe: {{ equipe.nome }} - TaskFlow{% endblock %}
 
 {% block content %}
-<div class="form-container" style="max-width: 600px;">
-    <div class="card p-5 text-center">
-        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
-        <h2 class="mb-3">Confirmar Exclusão</h2>
-        <p class="text-muted mb-4">
-            Você tem certeza que deseja excluir a equipe <strong class="text-dark">"{{ equipe.nome }}"</strong>? <br>
-            Esta ação não poderá ser desfeita e todos os dados associados a esta equipe serão perdidos.
+<div class="container py-5" style="max-width: 580px;">
+    <div class="card shadow-sm border-0 text-center p-4 p-md-5" style="border-radius: 16px; background: white;">
+        <div class="rounded-circle bg-danger bg-opacity-10 text-danger mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 72px; height: 72px; font-size: 32px;">
+            <i class="fas fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="fw-bold text-dark mb-2">Excluir Equipe</h3>
+        <p class="text-secondary mb-4" style="line-height: 1.6;">
+            Tem certeza de que deseja excluir permanentemente a equipe <strong class="text-dark">"{{ equipe.nome }}"</strong>?
+            <br><small class="text-muted">Todos os membros perderão acesso a este grupo de trabalho.</small>
         </p>
-        
+
         <form method="POST" class="d-flex justify-content-center gap-3">
             {% csrf_token %}
-            <a href="{% url 'equipe_detail' equipe.id %}" class="btn btn-light px-4">Cancelar</a>
-            <button type="submit" class="btn btn-danger px-4">Sim, Excluir Equipe</button>
+            <a href="{% url 'equipe_detail' equipe.id %}" class="btn btn-outline-secondary px-4 py-2" style="border-radius: 8px;">
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-danger px-4 py-2" style="border-radius: 8px;">
+                <i class="fas fa-trash me-1"></i> Sim, Excluir Equipe
+            </button>
         </form>
     </div>
 </div>

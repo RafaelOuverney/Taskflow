@@ -1,90 +1,139 @@
 {% extends 'base.html' %}
 {% load static crispy_forms_tags %}
 
-{% block title %}Perfil - TaskFlow{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/perfil.css' %}">
-{% endblock %}
+{% block title %}Meu Perfil - TaskFlow{% endblock %}
 
 {% block content %}
-<div class="profile-container">
-    <div class="profile-header card">
-        <div class="avatar-wrapper">
-            <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}https://ui-avatars.com/api/?name={{ user.first_name }}+{{ user.last_name }}&background=0D8ABC&color=fff{% endif %}"
-                alt="Avatar" id="avatarPreview">
-            <button class="upload-btn" id="uploadAvatarBtn"><i class="fas fa-upload"></i></button>
-        </div>
-        <div class="profile-title">
-            <h2>{{ user.first_name }} {{ user.last_name }}</h2>
-            <p><span class="badge">@{{ user.username }}</span> &bull; {{ user.email|default:user.email }}</p>
+<div class="container-fluid py-4" style="max-width: 1000px;">
+    <!-- Banner do Perfil -->
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 14px; background: white; overflow: hidden;">
+        <div style="height: 110px; background: linear-gradient(135deg, #2563eb, #1d4ed8);"></div>
+        <div class="card-body p-4 pt-0 position-relative">
+            <div class="d-flex flex-wrap align-items-end justify-content-between gap-3" style="margin-top: -45px;">
+                <div class="d-flex align-items-end gap-3">
+                    <div class="rounded-circle border border-4 border-white shadow bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-2" 
+                         style="width: 88px; height: 88px;">
+                        {{ user.first_name|default:user.username|make_list|first|upper }}
+                    </div>
+                    <div class="mb-1">
+                        <h3 class="fw-bold text-dark mb-0">{{ user.get_full_name|default:user.username }}</h3>
+                        <p class="text-muted mb-0">
+                            <span class="badge bg-light text-dark border">@{{ user.username }}</span> &bull; {{ user.email }}
+                        </p>
+                    </div>
+                </div>
+                <div class="mb-1">
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2">
+                        <i class="fas fa-circle-check me-1"></i> Conta Ativa
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <form method="POST" enctype="multipart/form-data" class="profile-form-grid">
-        {% csrf_token %}
-        <input type="file" id="avatarInput" name="avatar" accept="image/*" style="display: none;">
+    <!-- Formulários em 2 Colunas -->
+    <div class="row g-4">
+        <!-- Coluna da Esquerda: Dados Pessoais -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 14px; background: white;">
+                <div class="card-header bg-white border-bottom p-4">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-user text-primary me-2"></i>Informações Pessoais</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Primeiro Nome</label>
+                                {{ user_form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Sobrenome</label>
+                                {{ user_form.last_name }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold text-secondary small">Email</label>
+                                {{ user_form.email }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold text-secondary small">Telefone / WhatsApp</label>
+                                {{ profile_form.phone_number }}
+                                <small class="text-muted">Formato com máscara automática: (00) 00000-0000</small>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold text-secondary small">Biografia / Resumo Profissional</label>
+                                {{ profile_form.bio }}
+                            </div>
+                        </div>
 
-        <div class="left-column">
-            <div class="card form-section">
-                <h3><i class="fas fa-user"></i> Informações Pessoais</h3>
-                {{ user_form.first_name|as_crispy_field }}
-                {{ user_form.last_name|as_crispy_field }}
-                {{ user_form.email|as_crispy_field }}
-                {{ profile_form.phone_number|as_crispy_field }}
-                {{ profile_form.bio|as_crispy_field }}
+                        <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                            <button type="submit" class="btn btn-primary px-4" style="background: var(--primary); border: none; border-radius: 8px;">
+                                <i class="fas fa-save me-1"></i> Salvar Perfil
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 
-        <div class="right-column">
-            <div class="card form-section">
-                <h3><i class="fas fa-sliders-h"></i> Account Settings</h3>
-                <div class="settings-row">
-                    <label>Language</label>
-                    {{ profile_form.language|as_crispy_field }}
+        <!-- Coluna da Direita: Preferências e Segurança -->
+        <div class="col-lg-5">
+            <!-- Preferências -->
+            <div class="card shadow-sm border-0 mb-4" style="border-radius: 14px; background: white;">
+                <div class="card-header bg-white border-bottom p-4">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-sliders text-primary me-2"></i>Preferências</h5>
                 </div>
-                <div class="settings-row">
-                    <label>Timezone</label>
-                    {{ profile_form.timezone|as_crispy_field }}
-                </div>
-            </div>
-        </div>
-
-        <div class="form-actions">
-            <a href="{% url 'dashboard' %}" class="btn-cancel">Cancelar</a>
-            <button type="submit" class="btn-save">Salvar Alterações</button>
-        </div>
-    </form>
-
-    <form method="POST" action="{% url 'alterar_senha' %}" class="profile-form-grid" style="margin-top: 24px;">
-        {% csrf_token %}
-        <div class="right-column" style="grid-column: 1 / -1;">
-            <div class="card form-section">
-                <h3><i class="fas fa-shield-alt"></i> Segurança (Alterar Senha)</h3>
-                {{ password_form.current_password|as_crispy_field }}
-                {{ password_form.new_password|as_crispy_field }}
-                {{ password_form.confirm_password|as_crispy_field }}
-
-                <div class="toggle-row mt-4">
-                    <div>
-                        <strong>Two-Factor Authentication</strong>
-                        <p class="text-muted">Secure your account with 2FA</p>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary small">Idioma</label>
+                        {{ profile_form.language }}
                     </div>
-                    <label class="switch">
-                        <input type="checkbox" name="two_factor" {% if user.profile.two_factor %}checked{% endif %}>
-                        <span class="slider round"></span>
-                    </label>
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold text-secondary small">Fuso Horário</label>
+                        {{ profile_form.timezone }}
+                    </div>
                 </div>
+            </div>
 
-                <div class="form-actions" style="margin-top: 16px;">
-                    <button type="submit" class="btn-save">Atualizar Senha</button>
+            <!-- Segurança (Alterar Senha) -->
+            <div class="card shadow-sm border-0" id="seguranca" style="border-radius: 14px; background: white;">
+                <div class="card-header bg-white border-bottom p-4">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-key text-primary me-2"></i>Segurança da Conta</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{% url 'alterar_senha' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-secondary small">Senha Atual</label>
+                            <input type="password" name="current_password" class="form-control" required placeholder="Digite sua senha atual">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-secondary small">Nova Senha</label>
+                            <input type="password" name="new_password" class="form-control" required placeholder="Mínimo de 8 caracteres">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-secondary small">Confirmar Nova Senha</label>
+                            <input type="password" name="confirm_password" class="form-control" required placeholder="Repita a nova senha">
+                        </div>
+
+                        <button type="submit" class="btn btn-outline-primary w-100 py-2" style="border-radius: 8px;">
+                            <i class="fas fa-lock me-1"></i> Atualizar Senha
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
-    </form>
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/perfil.js' %}"></script>
+<script>
+$(document).ready(function() {
+    // Aplicação da máscara de telefone via jQuery Mask Plugin
+    if ($.fn.mask) {
+        $('.mask-phone, input[name="phone_number"]').mask('(00) 00000-0000');
+    }
+});
+</script>
 {% endblock %}

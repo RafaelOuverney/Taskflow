@@ -1,121 +1,204 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Análise - TaskFlow{% endblock %}
-{% load static %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-<link rel="stylesheet" href="{% static 'css/analise.css' %}">
-{% endblock %}
+{% block title %}Análise de Desempenho - TaskFlow{% endblock %}
 
 {% block content %}
-<div class="analise-header">
-    <div class="dashboard-title">
-        <h1>Análise do Grupo</h1>
-        <p>Desempenho da equipe quanto às tarefas dos seus membros.</p>
+<div class="container-fluid py-4" style="max-width: 1200px;">
+    <!-- Cabeçalho -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fas fa-chart-pie text-primary me-2"></i>Análise de Desempenho</h2>
+            <p class="text-muted mb-0">Métricas de produtividade e acompanhamento de tarefas por colaborador da equipe.</p>
+        </div>
+        {% if minhas_equipes %}
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-muted small fw-semibold">Equipe Selecionada:</span>
+            <form method="GET" class="d-inline-block">
+                <select name="equipe" class="form-select form-select-sm fw-semibold" onchange="this.form.submit()" style="min-width: 220px; border-radius: 8px;">
+                    {% for equipe in minhas_equipes %}
+                    <option value="{{ equipe.id }}" {% if equipe == equipe_selecionada %}selected{% endif %}>
+                        {{ equipe.nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        {% endif %}
     </div>
-    {% if minhas_equipes %}
-    <form method="GET">
-        <select name="equipe" class="analise-select" onchange="this.form.submit()">
-            {% for equipe in minhas_equipes %}
-            <option value="{{ equipe.id }}" {% if equipe == equipe_selecionada %}selected{% endif %}>
-                {{ equipe.nome }}
-            </option>
-            {% endfor %}
-        </select>
-    </form>
+
+    {% if equipe_selecionada %}
+    <!-- Métricas Gerais -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; background: white;">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-primary me-3 fs-4">
+                        <i class="fas fa-list-check"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold">Total de Tarefas</span>
+                        <h3 class="fw-bold mb-0 text-dark">{{ total_tarefas }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; background: white;">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-3 p-3 bg-success bg-opacity-10 text-success me-3 fs-4">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold">Concluídas</span>
+                        <h3 class="fw-bold mb-0 text-dark">{{ concluidas }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; background: white;">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-3 p-3 bg-warning bg-opacity-10 text-warning me-3 fs-4">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold">Pendentes</span>
+                        <h3 class="fw-bold mb-0 text-dark">{{ pendentes }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; background: white;">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-3 p-3 {% if taxa_conclusao >= 80 %}bg-success bg-opacity-10 text-success{% elif taxa_conclusao >= 50 %}bg-primary bg-opacity-10 text-primary{% else %}bg-danger bg-opacity-10 text-danger{% endif %} me-3 fs-4">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold">Taxa de Conclusão</span>
+                        <h3 class="fw-bold mb-0 text-dark">{{ taxa_conclusao }}%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desempenho por Membro e Prioridades -->
+    <div class="row g-4">
+        <!-- Coluna da Esquerda: Desempenho dos Colaboradores -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0" style="border-radius: 14px; background: white;">
+                <div class="card-header bg-white border-bottom p-4">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="fas fa-user-group text-primary me-2"></i>Desempenho por Membro — {{ equipe_selecionada.nome }}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex flex-column gap-3">
+                        {% for membro in analise_membros %}
+                        <div class="p-3 rounded-3 border" style="background: #f8fafc;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px;">
+                                        {{ membro.nome|make_list|first|upper }}
+                                    </div>
+                                    <div>
+                                        <strong class="text-dark">{{ membro.nome }}</strong>
+                                        {% if membro.eh_lider %}
+                                        <span class="badge bg-warning bg-opacity-10 text-dark border border-warning border-opacity-25 ms-1">👑 Líder</span>
+                                        {% endif %}
+                                        <small class="text-muted d-block" style="font-size: 12px;">{{ membro.email }}</small>
+                                    </div>
+                                </div>
+                                <span class="badge {% if membro.percentual >= 80 %}bg-success{% elif membro.percentual >= 50 %}bg-primary{% else %}bg-secondary{% endif %} fs-6 px-3 py-1">
+                                    {{ membro.percentual }}%
+                                </span>
+                            </div>
+
+                            <div class="progress mb-2" style="height: 8px;">
+                                <div class="progress-bar {% if membro.percentual >= 80 %}bg-success{% elif membro.percentual >= 50 %}bg-primary{% else %}bg-warning{% endif %}" 
+                                     style="width: {{ membro.percentual }}%;">
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                <strong>{{ membro.concluidas }}</strong> concluída(s) de <strong>{{ membro.total }}</strong> tarefa(s) • <span class="text-danger">{{ membro.pendentes }} pendente(s)</span>
+                            </small>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted py-4">Nenhum membro cadastrado nesta equipe.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna da Direita: Distribuição por Prioridade -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4" style="border-radius: 14px; background: white;">
+                <div class="card-header bg-white border-bottom p-4">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="fas fa-layer-group text-primary me-2"></i>Tarefas por Prioridade
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border" style="background: #fef2f2;">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="rounded-circle bg-danger" style="width: 12px; height: 12px;"></span>
+                                <strong class="text-danger">Alta Prioridade</strong>
+                            </div>
+                            <span class="badge bg-danger fs-6 px-3">{{ prioridades.high }}</span>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border" style="background: #fffbeb;">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="rounded-circle bg-warning" style="width: 12px; height: 12px;"></span>
+                                <strong class="text-warning">Média Prioridade</strong>
+                            </div>
+                            <span class="badge bg-warning text-dark fs-6 px-3">{{ prioridades.medium }}</span>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border" style="background: #f0fdf4;">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="rounded-circle bg-success" style="width: 12px; height: 12px;"></span>
+                                <strong class="text-success">Baixa Prioridade</strong>
+                            </div>
+                            <span class="badge bg-success fs-6 px-3">{{ prioridades.low }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Informativo -->
+            <div class="card shadow-sm border-0" style="border-radius: 14px; background: #eff6ff; border: 1px solid #bfdbfe !important;">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-primary mb-2"><i class="fas fa-lightbulb me-2"></i>Dica do TaskFlow</h6>
+                    <p class="small text-secondary mb-0" style="line-height: 1.5;">
+                        Você pode usar o <a href="{% url 'ia_assistente' %}" class="fw-bold text-primary text-decoration-none">Assistente IA</a> para sugerir uma redistribuição equilibrada de tarefas com base nos membros mais sobrecarregados.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card shadow-sm border-0 text-center py-5" style="border-radius: 14px; background: white;">
+        <div class="card-body">
+            <div class="rounded-circle bg-primary bg-opacity-10 text-primary mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 72px; height: 72px; font-size: 32px;">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h4 class="fw-bold text-dark">Acesso Restrito a Líderes</h4>
+            <p class="text-muted max-w-md mx-auto mb-4" style="max-width: 450px;">
+                Você não lidera nenhuma equipe no momento. Crie ou seja definido como líder de uma equipe para visualizar a análise detalhada de desempenho dos membros.
+            </p>
+            <a href="{% url 'equipe_create' %}" class="btn btn-primary px-4 py-2" style="background: var(--primary); border: none; border-radius: 8px;">
+                <i class="fas fa-plus me-1"></i> Criar Nova Equipe
+            </a>
+        </div>
+    </div>
     {% endif %}
 </div>
-
-{% if equipe_selecionada %}
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-body">
-            <p class="stat-label">Total de Tarefas do Grupo</p>
-            <h3 class="stat-value">{{ total_tarefas }}</h3>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-body">
-            <p class="stat-label">Concluídas</p>
-            <h3 class="stat-value">{{ concluidas }}</h3>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-body">
-            <p class="stat-label">Pendentes</p>
-            <h3 class="stat-value">{{ pendentes }}</h3>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-body">
-            <p class="stat-label">Taxa de Conclusão</p>
-            <h3 class="stat-value">{{ taxa_conclusao }}%</h3>
-        </div>
-    </div>
-</div>
-
-<div class="dashboard-grid">
-    <div class="chart-section">
-        <div class="chart-header">
-            <h2>Desempenho por Membro — {{ equipe_selecionada.nome }}</h2>
-        </div>
-        {% for membro in analise_membros %}
-        <div class="membro-card">
-            <div class="membro-topo">
-                <div>
-                    <p class="membro-nome">
-                        {{ membro.nome }}
-                        {% if membro.eh_lider %}
-                        <span class="stat-badge" style="margin-left: 6px;">👑 Líder</span>
-                        {% endif %}
-                    </p>
-                    <span class="membro-email">{{ membro.email }}</span>
-                </div>
-                <span class="stat-badge completed">{{ membro.percentual }}%</span>
-            </div>
-            <div class="progress-track">
-                <div class="progress-fill" style="width: {{ membro.percentual }}%;"></div>
-            </div>
-            <p class="text-muted" style="font-size: 12px; margin: 8px 0 0 0;">
-                {{ membro.concluidas }} concluída(s) de {{ membro.total }} tarefa(s) • {{ membro.pendentes }}
-                pendente(s)
-            </p>
-        </div>
-        {% empty %}
-        <p class="text-muted">Nenhum membro nesta equipe.</p>
-        {% endfor %}
-    </div>
-
-    <div class="sidebar-section">
-        <div class="tasks-section">
-            <div class="section-header">
-                <h3>Tarefas por Prioridade</h3>
-            </div>
-            <div class="prioridade-row">
-                <span class="prioridade-dot" style="background: #ef4444;"></span>
-                <span style="flex: 1;">Alta</span>
-                <strong>{{ prioridades.high }}</strong>
-            </div>
-            <div class="prioridade-row">
-                <span class="prioridade-dot" style="background: #f59e0b;"></span>
-                <span style="flex: 1;">Média</span>
-                <strong>{{ prioridades.medium }}</strong>
-            </div>
-            <div class="prioridade-row">
-                <span class="prioridade-dot" style="background: #10b981;"></span>
-                <span style="flex: 1;">Baixa</span>
-                <strong>{{ prioridades.low }}</strong>
-            </div>
-        </div>
-    </div>
-</div>
-{% else %}
-<div class="empty-state">
-    <i class="fas fa-lock"></i>
-    <h2>Acesso restrito a líderes</h2>
-    <p>Você não lidera nenhuma equipe. Apenas o líder/gerente de um grupo pode visualizar a análise de tarefas.</p>
-</div>
-{% endif %}
 {% endblock %}
