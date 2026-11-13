@@ -1,11 +1,13 @@
 import json
-from datetime import timedelta
+from collections import defaultdict
+from datetime import datetime, time, timedelta
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -26,6 +28,25 @@ from pages.filters import EquipeFilter, TaskFilter
 from pages.forms import EquipeForm, ProfileUpdateForm, SecurityForm, UserUpdateForm
 from pages.mixins import GroupRequiredMixin
 from pages.models import Equipe, Notebook, Task
+
+
+def _serialize_task(task):
+    """Serializa uma tarefa e suas subtarefas aproveitando o prefetch em memória."""
+    subtasks = [
+        {"id": s.id, "title": s.title, "completed": s.completed}
+        for s in task.subtasks.all()
+    ]
+    return {
+        "id": task.id,
+        "title": task.title,
+        "description": task.description,
+        "priority": task.priority,
+        "completed": task.completed,
+        "due_date": task.due_date.strftime("%d/%m/%Y %H:%M") if task.due_date else None,
+        "subtasks": subtasks,
+        "subtasks_count": len(subtasks),
+        "subtasks_completed": sum(1 for s in subtasks if s["completed"]),
+    }
 
 
 class IndexView(TemplateView):
@@ -194,15 +215,29 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         todas_tarefas = Task.objects.filter(owner=user)
 
-        total = todas_tarefas.count()
-        concluidas = todas_tarefas.filter(completed=True).count()
-        pendentes = todas_tarefas.filter(completed=False).count()
+        stats = todas_tarefas.aggregate(
+            total=Count("id"),
+            concluidas=Count("id", filter=Q(completed=True)),
+        )
+        total = stats["total"]
+        concluidas = stats["concluidas"]
+        pendentes = total - concluidas
 
-        tarefas_recentes = todas_tarefas.order_by("-created_at")[:5]
+        tarefas_recentes = todas_tarefas.prefetch_related("subtasks").order_by("-created_at")[:5]
 
         minhas_equipes = Equipe.objects.filter(membros=user).order_by("-updated_at")[:3]
 
-        hoje = timezone.now().date()
+        hoje = timezone.localdate()
+        inicio_janela = hoje - timedelta(days=6)
+        inicio_dt = timezone.make_aware(
+            datetime.combine(inicio_janela - timedelta(days=1), time.min)
+        )
+        contagem_por_dia = defaultdict(int)
+        for dt in todas_tarefas.filter(
+            completed=True, updated_at__gte=inicio_dt
+        ).values_list("updated_at", flat=True):
+            contagem_por_dia[timezone.localtime(dt).date()] += 1
+
         dias_semana = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"]
         tarefas_por_dia = []
 
@@ -211,7 +246,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         for i in range(6, -1, -1):
             dia = hoje - timedelta(days=i)
-            count = todas_tarefas.filter(completed=True, updated_at__date=dia).count()
+            count = contagem_por_dia.get(dia, 0)
             dados_brutos.append(count)
             max_value = max(max_value, count)
 
@@ -384,9 +419,21 @@ class TasksListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        stats = Task.objects.filter(owner=self.request.user).aggregate(
+            total=Count("id"),
+            completed=Count("id", filter=Q(completed=True)),
+        )
+        total = stats["total"]
+        completed = stats["completed"]
         context["user_name"] = self.request.user.first_name or self.request.user.email
         context["filter"] = self.filterset
         context["filterset"] = self.filterset
+        context["tasks_page_data"] = [_serialize_task(task) for task in context["tasks"]]
+        context["tasks_stats"] = {
+            "total": total,
+            "completed": completed,
+            "pending": total - completed,
+        }
         return context
 
 
@@ -624,35 +671,36 @@ class SubTaskDeleteAPI(LoginRequiredMixin, TemplateView):
 
 class TasksGetListAPI(LoginRequiredMixin, TemplateView):
     def get(self, request):
-        from .models import Task
-
         try:
-            tasks = Task.objects.filter(owner=request.user).prefetch_related("subtasks")
+            base_qs = Task.objects.filter(owner=request.user).prefetch_related("subtasks")
+            stats_agg = Task.objects.filter(owner=request.user).aggregate(
+                total=Count("id"),
+                completed=Count("id", filter=Q(completed=True)),
+            )
 
-            tasks_data = []
-            for task in tasks:
-                subtasks = [
-                    {"id": s.id, "title": s.title, "completed": s.completed}
-                    for s in task.subtasks.all()
-                ]
+            qs = base_qs
+            if any(k in request.GET for k in ("title", "priority", "completed")):
+                qs = TaskFilter(request.GET, queryset=qs).qs
 
-                tasks_data.append(
-                    {
-                        "id": task.id,
-                        "title": task.title,
-                        "description": task.description,
-                        "priority": task.priority,
-                        "completed": task.completed,
-                        "due_date": task.due_date.strftime("%d/%m/%Y %H:%M")
-                        if task.due_date
-                        else None,
-                        "subtasks": subtasks,
-                        "subtasks_count": task.subtasks_count,
-                        "subtasks_completed": task.subtasks_completed,
-                    }
-                )
+            if "page" in request.GET:
+                page_obj = Paginator(qs, 5).get_page(request.GET.get("page"))
+                target_tasks = page_obj.object_list
+            else:
+                target_tasks = qs
 
-            return JsonResponse({"success": True, "tasks": tasks_data})
+            tasks_data = [_serialize_task(task) for task in target_tasks]
+            total = stats_agg["total"]
+            completed = stats_agg["completed"]
+
+            return JsonResponse({
+                "success": True,
+                "tasks": tasks_data,
+                "stats": {
+                    "total": total,
+                    "completed": completed,
+                    "pending": total - completed,
+                },
+            })
         except Exception as e:
             return JsonResponse(
                 {"success": False, "message": f"Erro ao buscar tarefas: {str(e)}"},
@@ -677,16 +725,38 @@ class SobreView(TemplateView):
     template_name = "sobre.html"
 
 
-class PerfilView(LoginRequiredMixin, TemplateView):
+class PerfilView(LoginRequiredMixin, View):
     template_name = "perfil.html"
     login_url = "index"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["user_form"] = UserUpdateForm(instance=self.request.user)
-        context["profile_form"] = ProfileUpdateForm()
-        context["password_form"] = SecurityForm()
-        return context
+    def _build_context(self, request, user_form=None, profile_form=None):
+        extras = request.session.get("profile_extras", {})
+        return {
+            "user_form": user_form or UserUpdateForm(instance=request.user),
+            "profile_form": profile_form or ProfileUpdateForm(initial=extras),
+            "password_form": SecurityForm(),
+        }
+
+    def get(self, request):
+        return render(request, self.template_name, self._build_context(request))
+
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        profile_form = ProfileUpdateForm(request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            request.session["profile_extras"] = profile_form.cleaned_data
+            messages.success(request, "Perfil atualizado com sucesso!")
+            return redirect("perfil")
+
+        messages.error(request, "Erro ao atualizar o perfil. Verifique os campos.")
+        return render(
+            request,
+            self.template_name,
+            self._build_context(request, user_form=user_form, profile_form=profile_form),
+        )
 
 
 class AlterarSenhaView(LoginRequiredMixin, View):
@@ -813,7 +883,7 @@ class AnaliseView(LoginRequiredMixin, GroupRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        equipes_lideradas = Equipe.objects.filter(owner=user)
+        equipes_lideradas = Equipe.objects.filter(owner=user).prefetch_related("membros")
 
         equipe_id = self.request.GET.get("equipe")
         equipe_selecionada = (
@@ -828,24 +898,30 @@ class AnaliseView(LoginRequiredMixin, GroupRequiredMixin, TemplateView):
         analise_membros = []
 
         if equipe_selecionada:
-            membros = equipe_selecionada.membros.all()
-            tarefas_equipe = Task.objects.filter(owner__in=membros).select_related(
-                "owner"
+            membros = list(equipe_selecionada.membros.all())
+            tarefas_resumo = list(
+                Task.objects.filter(owner__in=membros).values_list(
+                    "owner_id", "priority", "completed"
+                )
             )
 
-            total_tarefas = tarefas_equipe.count()
-            concluidas = tarefas_equipe.filter(completed=True).count()
+            stats_por_membro = defaultdict(lambda: {"total": 0, "concluidas": 0})
+            for owner_id, priority, completed in tarefas_resumo:
+                total_tarefas += 1
+                if completed:
+                    concluidas += 1
+                if priority in prioridades:
+                    prioridades[priority] += 1
+                stats_por_membro[owner_id]["total"] += 1
+                if completed:
+                    stats_por_membro[owner_id]["concluidas"] += 1
+
             pendentes = total_tarefas - concluidas
 
-            for nivel in prioridades:
-                prioridades[nivel] = tarefas_equipe.filter(priority=nivel).count()
-
             for membro in membros:
-                tarefas_membro = tarefas_equipe.filter(
-                    owner=membro
-                )  
-                m_total = tarefas_membro.count()
-                m_concluidas = tarefas_membro.filter(completed=True).count()
+                m_stats = stats_por_membro[membro.id]
+                m_total = m_stats["total"]
+                m_concluidas = m_stats["concluidas"]
                 analise_membros.append(
                     {
                         "nome": membro.first_name or membro.username,

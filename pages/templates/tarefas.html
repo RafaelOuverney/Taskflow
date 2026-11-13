@@ -53,15 +53,15 @@
             <h4>Estatísticas</h4>
             <div class="stat-item">
                 <span class="stat-label">Total de tarefas</span>
-                <span class="stat-value" id="totalTasks">0</span>
+                <span class="stat-value" id="totalTasks">{{ tasks_stats.total|default:0 }}</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Concluídas</span>
-                <span class="stat-value" id="completedTasks">0</span>
+                <span class="stat-value" id="completedTasks">{{ tasks_stats.completed|default:0 }}</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Pendentes</span>
-                <span class="stat-value" id="pendingTasks">0</span>
+                <span class="stat-value" id="pendingTasks">{{ tasks_stats.pending|default:0 }}</span>
             </div>
         </div>
     </aside>
@@ -94,7 +94,21 @@
         </form>
 
         <div class="tasks-list" id="tasksList">
+            {% for task in tasks %}
+            <div class="task-item {% if task.completed %}completed{% endif %}" data-task-id="{{ task.id }}">
+                <div class="task-content">
+                    <div class="task-header">
+                        <h3 class="task-title">{{ task.title }}</h3>
+                        <span class="task-priority {{ task.priority }}">{{ task.get_priority_display }}</span>
+                    </div>
+                    {% if task.description %}
+                    <p class="task-description">{{ task.description }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
         </div>
+        {% if is_paginated %}
         <div class="paginacao">
             {% if page_obj.has_previous %}
             <a href="?{% param_replace page=page_obj.previous_page_number %}" class="btn-pag">Anterior</a>
@@ -106,6 +120,10 @@
             <a href="?{% param_replace page=page_obj.next_page_number %}" class="btn-pag">Próxima</a>
             {% endif %}
         </div>
+        {% endif %}
+
+        {{ tasks_page_data|json_script:"tasks-page-data" }}
+        {{ tasks_stats|json_script:"tasks-stats-data" }}
 
         <div class="empty-state" id="emptyState">
             <i class="fas fa-tasks"></i>

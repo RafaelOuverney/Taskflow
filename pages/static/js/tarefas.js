@@ -30,9 +30,35 @@ function getCookie(name) {
     return cookieValue;
 }
 
+let serverStats = null;
+
+function buildApiListUrl() {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('page')) {
+        params.set('page', '1');
+    }
+    return `/api/task/list/?${params.toString()}`;
+}
+
+function hydrateInitialTasks() {
+    const pageDataEl = document.getElementById('tasks-page-data');
+    const statsDataEl = document.getElementById('tasks-stats-data');
+    if (statsDataEl) {
+        serverStats = JSON.parse(statsDataEl.textContent);
+    }
+    if (pageDataEl) {
+        allTasks = JSON.parse(pageDataEl.textContent);
+        applyFilters();
+        updateStats();
+        renderTasks();
+        return true;
+    }
+    return false;
+}
+
 async function loadTasks() {
     try {
-        const response = await fetch('/api/task/list/', {
+        const response = await fetch(buildApiListUrl(), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -42,6 +68,9 @@ async function loadTasks() {
         const data = await response.json();
         if (data.success) {
             allTasks = data.tasks;
+            if (data.stats) {
+                serverStats = data.stats;
+            }
             applyFilters();
             updateStats();
             renderTasks();
@@ -69,6 +98,12 @@ function applyFilters() {
 }
 
 function updateStats() {
+    if (serverStats) {
+        totalTasksSpan.textContent = serverStats.total;
+        completedTasksSpan.textContent = serverStats.completed;
+        pendingTasksSpan.textContent = serverStats.pending;
+        return;
+    }
     const completed = allTasks.filter(t => t.completed).length;
     const pending = allTasks.filter(t => !t.completed).length;
 
@@ -244,6 +279,11 @@ function showModalCreateTask() {
                 showToast('Tarefa criada com sucesso!', 'success');
                 handleCancel();
                 loadTasks();
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('new') === '1') {
+    showModalCreateTask();
+}
             } else {
                 showToast('Erro ao criar tarefa: ' + data.message, 'error');
                 btnConfirm.disabled = false;
@@ -331,6 +371,11 @@ function showModalEditTask(task) {
                 showToast('Tarefa atualizada com sucesso!', 'success');
                 handleCancel();
                 loadTasks();
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('new') === '1') {
+    showModalCreateTask();
+}
             } else {
                 showToast('Erro ao atualizar tarefa: ' + data.message, 'error');
                 btnConfirm.disabled = false;
@@ -385,6 +430,11 @@ async function toggleTask(taskId, completed) {
         const data = await response.json();
         if (data.success) {
             loadTasks();
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('new') === '1') {
+    showModalCreateTask();
+}
             const status = completed ? 'concluída' : 'marcada como pendente';
             showToast(`Tarefa ${status}!`, 'success');
         } else {
@@ -419,6 +469,11 @@ async function deleteTask(taskId) {
         if (data.success) {
             showToast('Tarefa deletada com sucesso!', 'success');
             loadTasks();
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('new') === '1') {
+    showModalCreateTask();
+}
         } else {
             showToast('Erro ao deletar tarefa: ' + data.message, 'error');
         }
@@ -453,6 +508,11 @@ async function createSubtask(taskId, title) {
         if (data.success) {
             showToast('Sub-tarefa criada com sucesso!', 'success');
             loadTasks();
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('new') === '1') {
+    showModalCreateTask();
+}
         } else {
             showToast('Erro ao criar sub-tarefa: ' + data.message, 'error');
         }
@@ -479,6 +539,11 @@ async function toggleSubtask(subtaskId, completed) {
         const data = await response.json();
         if (data.success) {
             loadTasks();
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('new') === '1') {
+    showModalCreateTask();
+}
         } else {
             showToast('Erro ao atualizar sub-tarefa', 'error');
         }
@@ -503,6 +568,11 @@ async function deleteSubtask(subtaskId) {
         if (data.success) {
             showToast('Sub-tarefa deletada com sucesso!', 'success');
             loadTasks();
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('new') === '1') {
+    showModalCreateTask();
+}
         } else {
             showToast('Erro ao deletar sub-tarefa', 'error');
         }
@@ -656,4 +726,11 @@ function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-loadTasks();
+if (!hydrateInitialTasks()) {
+    loadTasks();
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('new') === '1') {
+    showModalCreateTask();
+}
