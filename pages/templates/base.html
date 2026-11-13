@@ -9,6 +9,7 @@
     <title>{% block title %}TaskFlow{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
@@ -99,6 +100,44 @@
                         <span>Calendário</span>
                     </a>
                 </li>
+                <li style="margin-top: 14px; padding: 4px 16px; font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;">
+                    Inteligência Artificial
+                </li>
+                <li>
+                    <a href="{% url 'ia_assistente' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'ia_assistente' %}active{% endif %}">
+                        <i class="fas fa-robot text-primary"></i>
+                        <span>Assistente IA</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'ia_meu_consumo' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'ia_meu_consumo' %}active{% endif %}">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Meu Consumo</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'ia_requisicoes' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'ia_requisicoes' %}active{% endif %}">
+                        <i class="fas fa-list-check"></i>
+                        <span>Auditoria IA</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'ia_usuarios' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'ia_usuarios' %}active{% endif %}">
+                        <i class="fas fa-users-gear"></i>
+                        <span>IA por Usuário</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'ia_config' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'ia_config' %}active{% endif %}">
+                        <i class="fas fa-sliders"></i>
+                        <span>Configuração IA</span>
+                    </a>
+                </li>
             </ul>
         </nav>
 
@@ -175,6 +214,13 @@
         </div>
     </main>
 
+        <!-- jQuery e Plugins (DataTables, Bootbox, Mask) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/6.0.0/bootbox.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script src="{% static 'js/base.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

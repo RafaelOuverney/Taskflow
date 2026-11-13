@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meu Consumo de IA - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="max-width: 1000px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fas fa-chart-pie text-primary me-2"></i>Meu Consumo de IA</h2>
+            <p class="text-muted mb-0">Acompanhe seu consumo mensal de tokens e histórico de requisições de Inteligência Artificial.</p>
+        </div>
+        <a href="{% url 'ia_assistente' %}" class="btn btn-primary" style="background: var(--primary); border: none;">
+            <i class="fas fa-comments me-1"></i> Abrir Assistente
+        </a>
+    </div>
+
+    <!-- Cards de Resumo da Cota -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; background: white;">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-primary me-3 fs-3">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold">Tokens Usados Este Mês</span>
+                        <h3 class="fw-bold mb-0 text-dark">{{ quota.tokens_used }}</h3>
+                        <small class="text-muted">Mês {{ quota.mes_ano }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; background: white;">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-3 p-3 bg-info bg-opacity-10 text-info me-3 fs-3">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold">Cota Mensal Total</span>
+                        <h3 class="fw-bold mb-0 text-dark">{{ quota.monthly_limit }}</h3>
+                        <small class="text-muted">Tokens disponíveis por mês</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; background: white;">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-3 p-3 {% if quota.remaining_tokens > 5000 %}bg-success bg-opacity-10 text-success{% else %}bg-danger bg-opacity-10 text-danger{% endif %} me-3 fs-3">
+                        <i class="fas fa-battery-three-quarters"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold">Saldo Restante</span>
+                        <h3 class="fw-bold mb-0 text-dark">{{ quota.remaining_tokens }}</h3>
+                        <small class="text-muted">Tokens restantes no ciclo</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de Progresso do Consumo -->
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 12px; background: white;">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-dark">Utilização da Cota Mensal</span>
+                <span class="fw-bold {% if quota.percentage_used >= 100 %}text-danger{% elif quota.percentage_used >= 80 %}text-warning{% else %}text-success{% endif %}">
+                    {{ quota.percentage_used }}%
+                </span>
+            </div>
+            <div class="progress mb-2" style="height: 12px; border-radius: 6px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated {% if quota.percentage_used >= 100 %}bg-danger{% elif quota.percentage_used >= 80 %}bg-warning{% else %}bg-primary{% endif %}" 
+                     role="progressbar" 
+                     style="width: {{ quota.percentage_used }}%;" 
+                     aria-valuenow="{{ quota.percentage_used }}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                </div>
+            </div>
+            <small class="text-muted">Sua cota mensal é renovada no primeiro dia de cada mês calendário.</small>
+        </div>
+    </div>
+
+    <!-- Histórico Pessoal Recente -->
+    <div class="card shadow-sm border-0" style="border-radius: 12px; background: white;">
+        <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+            <h5 class="fw-bold mb-0"><i class="fas fa-clock-rotate-left me-2 text-primary"></i>Minhas Últimas Requisições</h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Prompt (Resumo)</th>
+                            <th>Status</th>
+                            <th>Tokens</th>
+                            <th>Latência</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for audit in recent_audits %}
+                        <tr>
+                            <td><small class="text-muted">{{ audit.created_at|date:"d/m/Y H:i:s" }}</small></td>
+                            <td><span class="text-truncate d-inline-block" style="max-width: 320px;">{{ audit.prompt }}</span></td>
+                            <td>
+                                {% if audit.status == 'success' %}
+                                <span class="badge bg-success">Sucesso</span>
+                                {% elif audit.status == 'quota_exceeded' %}
+                                <span class="badge bg-warning text-dark">Cota Excedida</span>
+                                {% else %}
+                                <span class="badge bg-danger">Erro</span>
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ audit.total_tokens }}</strong></td>
+                            <td><small>{{ audit.latency_ms }}ms</small></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">Você ainda não realizou requisições de IA este mês.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

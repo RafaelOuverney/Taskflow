@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Auditoria de Requisições - IA TaskFlow{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fas fa-list-check text-primary me-2"></i>Auditoria de Requisições de IA</h2>
+            <p class="text-muted mb-0">Histórico completo de auditoria das chamadas processadas pela porta de entrada única do sistema.</p>
+        </div>
+        <a href="{% url 'ia_config' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-cog me-1"></i> Configurações
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 12px; background: white;">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table id="auditTable" class="table table-hover align-middle datatable" style="width: 100%;">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Data / Hora</th>
+                            <th>Usuário</th>
+                            <th>Origem</th>
+                            <th>Modelo</th>
+                            <th>Status</th>
+                            <th>Tokens</th>
+                            <th>Latência</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for audit in auditorias %}
+                        <tr>
+                            <td>
+                                <small class="fw-semibold text-secondary">{{ audit.created_at|date:"d/m/Y H:i:s" }}</small>
+                            </td>
+                            <td>
+                                {% if audit.user %}
+                                <span class="badge bg-light text-dark border">
+                                    <i class="fas fa-user me-1 text-primary"></i> {{ audit.user.username }}
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary">Anônimo</span>
+                                {% endif %}
+                            </td>
+                            <td><code>{{ audit.endpoint }}</code></td>
+                            <td><small class="badge bg-info text-dark">{{ audit.model_used }}</small></td>
+                            <td>
+                                {% if audit.status == 'success' %}
+                                <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Sucesso</span>
+                                {% elif audit.status == 'quota_exceeded' %}
+                                <span class="badge bg-warning text-dark"><i class="fas fa-ban me-1"></i> Cota Excedida</span>
+                                {% else %}
+                                <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i> Erro</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="fw-bold">{{ audit.total_tokens }}</span>
+                                <small class="text-muted d-block" style="font-size: 11px;">in: {{ audit.prompt_tokens }} | out: {{ audit.response_tokens }}</small>
+                            </td>
+                            <td><small>{{ audit.latency_ms }} ms</small></td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-primary view-details-btn" 
+                                        data-prompt="{{ audit.prompt|escapejs }}" 
+                                        data-response="{{ audit.response|escapejs }}"
+                                        data-error="{{ audit.error_message|escapejs }}">
+                                    <i class="fas fa-eye"></i> Detalhes
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                Nenhuma requisição registrada na auditoria até o momento.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver detalhes do prompt/resposta -->
+<div class="modal fade" id="auditDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px;">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold"><i class="fas fa-file-lines me-2 text-primary"></i>Detalhes da Chamada de IA</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="fw-bold text-muted small">PROMPT ENVIADO:</label>
+                    <pre id="modalPrompt" class="p-3 bg-light rounded" style="white-space: pre-wrap; max-height: 200px; overflow-y: auto; font-size: 13px;"></pre>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold text-muted small">RESPOSTA RECEBIDA:</label>
+                    <pre id="modalResponse" class="p-3 bg-light rounded" style="white-space: pre-wrap; max-height: 250px; overflow-y: auto; font-size: 13px;"></pre>
+                </div>
+                <div id="modalErrorContainer" class="d-none">
+                    <label class="fw-bold text-danger small">LOG DE ERRO:</label>
+                    <pre id="modalError" class="p-3 bg-danger bg-opacity-10 text-danger rounded" style="white-space: pre-wrap; font-size: 13px;"></pre>
+                </div>
+            </div>
+            <div class="modal-footer border-top">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Inicialização do plugin jQuery DataTables
+    if ($.fn.DataTable && $('#auditTable tbody tr').length > 0 && !$('#auditTable tbody tr td[colspan]').length) {
+        $('#auditTable').DataTable({
+            language: {
+                search: "Buscar auditoria:",
+                lengthMenu: "Exibir _MENU_ registros por página",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ chamadas",
+                infoEmpty: "Nenhuma chamada registrada",
+                paginate: {
+                    first: "Primeira",
+                    previous: "Anterior",
+                    next: "Próxima",
+                    last: "Última"
+                }
+            },
+            order: [[0, "desc"]],
+            pageLength: 10
+        });
+    }
+
+    // Modal de detalhes
+    $('.view-details-btn').on('click', function() {
+        const prompt = $(this).data('prompt');
+        const response = $(this).data('response');
+        const error = $(this).data('error');
+
+        $('#modalPrompt').text(prompt || '(vazio)');
+        $('#modalResponse').text(response || '(sem resposta gerada)');
+        if (error) {
+            $('#modalError').text(error);
+            $('#modalErrorContainer').removeClass('d-none');
+        } else {
+            $('#modalErrorContainer').addClass('d-none');
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('auditDetailModal'));
+        modal.show();
+    });
+});
+</script>
+{% endblock %}
+

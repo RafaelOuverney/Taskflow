@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configuração de IA - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fas fa-robot text-primary me-2"></i>Configurações da Inteligência Artificial</h2>
+            <p class="text-muted mb-0">Gerencie o provedor, modelos e parâmetros da única porta de entrada de IA do sistema.</p>
+        </div>
+        <div>
+            <button id="btnTestarConexao" class="btn btn-outline-primary">
+                <i class="fas fa-plug me-1"></i> Testar Conexão
+            </button>
+        </div>
+    </div>
+
+    <!-- Feedback do Teste de Conexão -->
+    <div id="testResultBox" class="alert d-none mb-4" role="alert">
+        <div class="d-flex align-items-center">
+            <i id="testResultIcon" class="fas fa-info-circle me-2 fs-5"></i>
+            <div>
+                <strong id="testResultTitle">Status do Teste:</strong>
+                <span id="testResultMessage" class="d-block"></span>
+                <small id="testResultLatency" class="text-muted"></small>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 12px; background: white;">
+        <div class="card-body p-4">
+            <form method="post" id="iaConfigForm">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Provedor de IA</label>
+                        {{ form.provider }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Modelo Principal</label>
+                        {{ form.model_name }}
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Chave de API (API Key)</label>
+                        {{ form.api_key }}
+                        <small class="text-muted">Obtenha sua chave no Google AI Studio (Gemini) ou OpenAI Platform.</small>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Endpoint Customizado (Opcional)</label>
+                        {{ form.endpoint_url }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Temperatura (Criatividade: 0.0 a 1.0)</label>
+                        {{ form.temperature }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Tokens Máximos por Resposta</label>
+                        {{ form.max_tokens }}
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Prompt de Sistema Padrão</label>
+                        {{ form.system_prompt }}
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-check form-switch mt-2">
+                            {{ form.ativo }}
+                            <label class="form-check-label fw-bold ms-2" for="{{ form.ativo.id_for_label }}">Habilitar IA no TaskFlow</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary px-4" style="background: var(--primary); border: none;">
+                        <i class="fas fa-save me-1"></i> Salvar Configurações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#btnTestarConexao').on('click', function() {
+        const btn = $(this);
+        const originalHtml = btn.html();
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Testando...');
+
+        const resultBox = $('#testResultBox');
+        resultBox.removeClass('d-none alert-success alert-danger alert-warning').addClass('alert-info');
+        $('#testResultTitle').text('Conectando...');
+        $('#testResultMessage').text('Enviando requisição de teste para o provedor...');
+        $('#testResultLatency').text('');
+
+        fetch("{% url 'ia_test_connection' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            resultBox.removeClass('alert-info');
+            if (data.success) {
+                resultBox.addClass('alert-success');
+                $('#testResultIcon').attr('class', 'fas fa-check-circle text-success me-2 fs-5');
+                $('#testResultTitle').text('Sucesso!');
+                $('#testResultMessage').text(data.response);
+                $('#testResultLatency').text(`Latência: ${data.latency_ms}ms | Tokens: ${data.total_tokens}`);
+            } else {
+                resultBox.addClass('alert-danger');
+                $('#testResultIcon').attr('class', 'fas fa-exclamation-circle text-danger me-2 fs-5');
+                $('#testResultTitle').text('Falha na Conexão:');
+                $('#testResultMessage').text(data.error || 'Não foi possível se comunicar com a API.');
+            }
+        })
+        .catch(err => {
+            resultBox.removeClass('alert-info').addClass('alert-danger');
+            $('#testResultTitle').text('Erro na requisição:');
+            $('#testResultMessage').text(err.message);
+        })
+        .finally(() => {
+            btn.prop('disabled', false).html(originalHtml);
+        });
+    });
+});
+</script>
+{% endblock %}
+
