@@ -1,0 +1,18 @@
+runtime: python312
+instance_class: F1
+
+entrypoint: gunicorn -b :$PORT Taskflow.wsgi:application --workers 2 --threads 4 --timeout 60
+
+env_variables:
+  DJANGO_SETTINGS_MODULE: 'Taskflow.settings'
+  # Em produção no App Engine, configure a DATABASE_URL para sua instância PostgreSQL (Neon/Cloud SQL):
+  # DATABASE_URL: 'postgresql://...'
+
+handlers:
+  - url: /static
+    static_dir: staticfiles/
+
+  - url: /.*
+    script: auto
+    secure: always
+

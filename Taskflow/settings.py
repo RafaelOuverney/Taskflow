@@ -34,7 +34,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'chave-insegura-de-fallback')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.appspot.com', '*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -49,10 +49,13 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'debug_toolbar',
+    'django_filters',
+    'ia.apps.IaConfig',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -130,9 +133,13 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+_local_static = BASE_DIR / 'static'
+STATICFILES_DIRS = [str(_local_static)] if _local_static.exists() else []
+
+# WhiteNoise para servir arquivos estáticos em produção (App Engine)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # django-cors-headers
 CORS_ALLOW_ALL_ORIGINS = True
