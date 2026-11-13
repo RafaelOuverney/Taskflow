@@ -49,10 +49,16 @@ class Task(models.Model):
     
     @property
     def subtasks_count(self):
+        prefetched = getattr(self, "_prefetched_objects_cache", {})
+        if "subtasks" in prefetched:
+            return len(prefetched["subtasks"])
         return self.subtasks.count()
     
     @property
     def subtasks_completed(self):
+        prefetched = getattr(self, "_prefetched_objects_cache", {})
+        if "subtasks" in prefetched:
+            return sum(1 for subtask in prefetched["subtasks"] if subtask.completed)
         return self.subtasks.filter(completed=True).count()
 
 

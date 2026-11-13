@@ -70,9 +70,19 @@ class IAConsumoUsuariosView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         mes_ano = get_current_mes_ano()
-        # Garante que todos os usuários ativos possuam registro no mês
-        for u in User.objects.all():
-            UserTokenQuota.get_or_create_for_user(u)
+        # Cria cotas ausentes em lote para evitar consultas N+1 por usuário
+        existing_user_ids = set(
+            UserTokenQuota.objects.filter(mes_ano=mes_ano).values_list("user_id", flat=True)
+        )
+        missing_users = User.objects.exclude(id__in=existing_user_ids)
+        if missing_users.exists():
+            UserTokenQuota.objects.bulk_create(
+                [
+                    UserTokenQuota(user=u, mes_ano=mes_ano, monthly_limit=50000, tokens_used=0)
+                    for u in missing_users
+                ],
+                ignore_conflicts=True,
+            )
         return UserTokenQuota.objects.filter(mes_ano=mes_ano).select_related('user').order_by('-tokens_used')
 
     def get_context_data(self, **kwargs):
