@@ -64,6 +64,14 @@
                                 <label class="form-label fw-semibold text-secondary small">Biografia / Resumo Profissional</label>
                                 {{ profile_form.bio }}
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Idioma</label>
+                                {{ profile_form.language }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Fuso Horário</label>
+                                {{ profile_form.timezone }}
+                            </div>
                         </div>
 
                         <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
@@ -76,25 +84,8 @@
             </div>
         </div>
 
-        <!-- Coluna da Direita: Preferências e Segurança -->
+        <!-- Coluna da Direita: Segurança -->
         <div class="col-lg-5">
-            <!-- Preferências -->
-            <div class="card shadow-sm border-0 mb-4" style="border-radius: 14px; background: white;">
-                <div class="card-header bg-white border-bottom p-4">
-                    <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-sliders text-primary me-2"></i>Preferências</h5>
-                </div>
-                <div class="card-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold text-secondary small">Idioma</label>
-                        {{ profile_form.language }}
-                    </div>
-                    <div class="mb-0">
-                        <label class="form-label fw-semibold text-secondary small">Fuso Horário</label>
-                        {{ profile_form.timezone }}
-                    </div>
-                </div>
-            </div>
-
             <!-- Segurança (Alterar Senha) -->
             <div class="card shadow-sm border-0" id="seguranca" style="border-radius: 14px; background: white;">
                 <div class="card-header bg-white border-bottom p-4">

@@ -61,13 +61,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-kanban"></i>
-                        <span>Kanban</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'equipes' %}" class="nav-link">
+                    <a href="{% url 'equipes' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'equipes' or 'equipe_' in request.resolver_match.url_name %}active{% endif %}">
                         <i class="fas fa-users"></i>
                         <span>Equipes</span>
                     </a>
@@ -142,11 +137,13 @@
         </nav>
 
         <div class="sidebar-bottom">
-            <a href="#" class="nav-link">
+            <a href="{% url 'perfil' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'perfil' %}active{% endif %}">
                 <i class="fas fa-cog"></i>
                 <span>Configurações</span>
             </a>
-            <a href="#" class="nav-link">
+            <a href="{% url 'ia_assistente' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'ia_assistente' %}active{% endif %}">
                 <i class="fas fa-headset"></i>
                 <span>Suporte</span>
             </a>
@@ -163,16 +160,15 @@
             </div>
 
             <div class="header-icons">
-                <button class="icon-btn" title="Notificações">
+                <a href="{% url 'tarefas' %}" class="icon-btn" title="Minhas Tarefas">
                     <i class="fas fa-bell"></i>
-                    <span class="badge">3</span>
-                </button>
-                <button class="icon-btn" title="Ajuda">
+                </a>
+                <a href="{% url 'ia_assistente' %}" class="icon-btn" title="Ajuda / Assistente IA">
                     <i class="fas fa-circle-question"></i>
-                </button>
-                <button class="icon-btn" title="Configurações">
+                </a>
+                <a href="{% url 'perfil' %}" class="icon-btn" title="Configurações">
                     <i class="fas fa-gear"></i>
-                </button>
+                </a>
                 <button class="icon-btn user-btn" id="userMenuBtn" title="Perfil">
                     <i class="fas fa-user-circle"></i>
                 </button>
@@ -192,7 +188,7 @@
                 class="user-menu-item {% if request.resolver_match.url_name == 'perfil' %}active{% endif %}">
                 <i class="fas fa-user"></i> Meu Perfil
             </a>
-            <a href="#" class="user-menu-item">
+            <a href="{% url 'perfil' %}" class="user-menu-item">
                 <i class="fas fa-cog"></i> Configurações da Conta
             </a>
             <a href="{% url 'perfil' %}#seguranca" class="user-menu-item">

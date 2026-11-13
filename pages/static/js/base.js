@@ -14,15 +14,22 @@ document.addEventListener('click', (e) => {
 const newTaskBtn = document.getElementById('newTaskBtn');
 if (newTaskBtn) {
     newTaskBtn.addEventListener('click', () => {
-        console.log('Nova tarefa clicada');
-        alert('Função de nova tarefa em desenvolvimento');
+        if (typeof showModalCreateTask === 'function') {
+            showModalCreateTask();
+        } else {
+            window.location.href = '/tarefas/?new=1';
+        }
     });
 }
 
 const searchInput = document.querySelector('.search-bar input');
 if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-        console.log('Busca:', e.target.value);
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const term = searchInput.value.trim();
+            window.location.href = term ? `/tarefas/?title=${encodeURIComponent(term)}` : '/tarefas/';
+        }
     });
 }
 
